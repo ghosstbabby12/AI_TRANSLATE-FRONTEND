@@ -4,6 +4,7 @@ import { useEstadoVideo } from "../hooks/useEstadoVideo";
 import { formatoTiempo } from "../vtt";
 import { BarraProgreso } from "./BarraProgreso";
 import { EstadoBadge } from "./EstadoBadge";
+import { IconoDescargar, IconoReintentar } from "./Iconos";
 import { ReproductorSubtitulado } from "./ReproductorSubtitulado";
 
 export function VistaVideo({ id }: { id: string }) {
@@ -13,7 +14,7 @@ export function VistaVideo({ id }: { id: string }) {
   const [accion, setAccion] = useState<string | null>(null);
 
   if (!estado || !detalle) {
-    return <p className="sutil">{error ?? "Cargando…"}</p>;
+    return <p className="sutil centrado">{error ?? "Cargando…"}</p>;
   }
 
   const buscar = (segundos: number) => {
@@ -40,15 +41,54 @@ export function VistaVideo({ id }: { id: string }) {
   };
 
   const listos = estado.segmentos.filter((s) => s.estado === "listo" && s.texto_traducido);
+  const sinSubtitulos = estado.progreso.listos === 0;
+  const puedeReintentar =
+    (estado.estado === "error" && estado.progreso.total === 0) ||
+    (estado.progreso.errores > 0 && estado.estado !== "procesando");
+
+  const acciones = (
+    <>
+      {(["srt", "vtt"] as const).map((f) => (
+        <button
+          key={f}
+          type="button"
+          className="boton-icono con-texto"
+          data-tip={`Descargar subtítulos .${f}`}
+          aria-label={`Descargar subtítulos .${f}`}
+          disabled={sinSubtitulos}
+          onClick={() => descargar(f)}
+        >
+          <IconoDescargar />
+          <span>{f.toUpperCase()}</span>
+        </button>
+      ))}
+      {puedeReintentar && (
+        <button
+          type="button"
+          className="boton-icono"
+          data-tip={estado.progreso.total === 0 ? "Reintentar video" : "Reintentar segmentos fallidos"}
+          aria-label={estado.progreso.total === 0 ? "Reintentar video" : "Reintentar segmentos fallidos"}
+          onClick={reintentar}
+        >
+          <IconoReintentar />
+        </button>
+      )}
+      <span className="separador" aria-hidden />
+    </>
+  );
 
   return (
     <section className="vista-video">
       <header className="vista-cabecera">
         <div>
           <h1 title={detalle.nombre}>{detalle.nombre}</h1>
-          <p className="sutil">
-            {estado.idioma_origen ? `${estado.idioma_origen.toUpperCase()} → ` : ""}
-            {estado.idioma_destino.toUpperCase()}
+          <p className="ruta-idiomas">
+            {estado.idioma_origen && (
+              <>
+                <span className="chip">{estado.idioma_origen.toUpperCase()}</span>→
+              </>
+            )}
+            <span className="chip chip-acento">{estado.idioma_destino.toUpperCase()}</span>
           </p>
         </div>
         <EstadoBadge estado={estado.estado} />
@@ -65,33 +105,15 @@ export function VistaVideo({ id }: { id: string }) {
             segmentos={estado.segmentos}
             videoRef={videoRef}
             onTiempo={setTiempo}
+            acciones={acciones}
           />
-          <BarraProgreso estado={estado} tiempoActual={tiempo} onBuscar={buscar} />
-
-          <div className="acciones">
-            <button type="button" onClick={() => descargar("srt")} disabled={estado.progreso.listos === 0}>
-              Descargar .srt
-            </button>
-            <button type="button" onClick={() => descargar("vtt")} disabled={estado.progreso.listos === 0}>
-              Descargar .vtt
-            </button>
-            {estado.estado === "error" && estado.progreso.total === 0 ? (
-              <button type="button" className="secundario" onClick={reintentar}>
-                Reintentar video
-              </button>
-            ) : (
-              estado.progreso.errores > 0 &&
-              estado.estado !== "procesando" && (
-                <button type="button" className="secundario" onClick={reintentar}>
-                  Reintentar segmentos fallidos
-                </button>
-              )
-            )}
+          <div className="tarjeta tarjeta-progreso">
+            <BarraProgreso estado={estado} tiempoActual={tiempo} onBuscar={buscar} />
           </div>
           {accion && <p className="sutil">{accion}</p>}
         </div>
 
-        <aside className="transcripcion">
+        <aside className="tarjeta transcripcion">
           <h2>Traducción en vivo</h2>
           {listos.length === 0 ? (
             <p className="sutil">Los segmentos aparecerán aquí a medida que se traduzcan.</p>

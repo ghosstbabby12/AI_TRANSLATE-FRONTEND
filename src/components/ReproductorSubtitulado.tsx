@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import type { SegmentoEstado } from "../api";
 import { cueEn, type Cue } from "../vtt";
+import { IconoContraer, IconoExpandir } from "./Iconos";
 
 interface Props {
   url: string | null;
@@ -8,6 +9,8 @@ interface Props {
   segmentos: SegmentoEstado[];
   videoRef: RefObject<HTMLVideoElement | null>;
   onTiempo: (segundos: number) => void;
+  /** Botones extra para la barra flotante (descargas, reintentar…). */
+  acciones?: ReactNode;
 }
 
 /**
@@ -15,7 +18,7 @@ interface Props {
  * <track>: así se actualizan al instante cuando llegan segmentos nuevos (un
  * <track> no relee su archivo) y se puede avisar qué tramo aún se traduce.
  */
-export function ReproductorSubtitulado({ url, cues, segmentos, videoRef, onTiempo }: Props) {
+export function ReproductorSubtitulado({ url, cues, segmentos, videoRef, onTiempo, acciones }: Props) {
   const contenedor = useRef<HTMLDivElement>(null);
   const [tiempo, setTiempo] = useState(0);
   const [pantallaCompleta, setPantallaCompleta] = useState(false);
@@ -29,6 +32,7 @@ export function ReproductorSubtitulado({ url, cues, segmentos, videoRef, onTiemp
   if (!url) {
     return (
       <div className="reproductor reproductor-vacio">
+        <span className="cargador" aria-hidden />
         <p>Preparando el video…</p>
       </div>
     );
@@ -63,9 +67,20 @@ export function ReproductorSubtitulado({ url, cues, segmentos, videoRef, onTiemp
       <div className="subtitulo" aria-live="polite">
         {cue ? <span>{cue.texto}</span> : traduciendo ? <span className="traduciendo">Traduciendo este tramo…</span> : null}
       </div>
-      <button type="button" className="boton-pantalla" onClick={alternarPantallaCompleta}>
-        {pantallaCompleta ? "Salir" : "Pantalla completa"}
-      </button>
+
+      {/* Barra flotante de acciones sobre el video */}
+      <div className="barra-flotante" role="toolbar" aria-label="Acciones del video">
+        {acciones}
+        <button
+          type="button"
+          className="boton-icono"
+          data-tip={pantallaCompleta ? "Salir de pantalla completa" : "Pantalla completa"}
+          aria-label={pantallaCompleta ? "Salir de pantalla completa" : "Pantalla completa"}
+          onClick={alternarPantallaCompleta}
+        >
+          {pantallaCompleta ? <IconoContraer /> : <IconoExpandir />}
+        </button>
+      </div>
     </div>
   );
 }
