@@ -101,7 +101,7 @@ export function PantallaAcceso() {
 
         {error && <p className="error">{error}</p>}
 
-        <button type="submit" className="primario" disabled={enviando}>
+        <button type="submit" className="primario grande" disabled={enviando}>
           {enviando ? "Un momento…" : esRegistro ? "Crear cuenta" : "Entrar"}
         </button>
 

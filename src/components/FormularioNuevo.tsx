@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { api, type Idioma } from "../api";
 import { navegar } from "../hooks/useRuta";
+import { IconoEnlace, IconoSubir, IconoTraducir } from "./Iconos";
 
 type Modo = "archivo" | "url";
 
@@ -41,10 +42,17 @@ export function FormularioNuevo() {
 
   return (
     <form className="tarjeta formulario" onSubmit={enviar}>
-      <h1>Traducir un video</h1>
-      <p className="sutil">
-        Sube un archivo o pega el link de un video público. Verás los subtítulos traducidos a medida que se generan.
-      </p>
+      <div className="formulario-cabecera">
+        <span className="icono-grande" aria-hidden>
+          <IconoTraducir />
+        </span>
+        <div>
+          <h1>Traducir un video</h1>
+          <p className="sutil">
+            Sube un archivo o pega el link de un video público. Verás los subtítulos traducidos a medida que se generan.
+          </p>
+        </div>
+      </div>
 
       <div className="pestanas" role="tablist">
         {(["archivo", "url"] as const).map((m) => (
@@ -57,6 +65,7 @@ export function FormularioNuevo() {
             onClick={() => setModo(m)}
             disabled={enviando}
           >
+            {m === "archivo" ? <IconoSubir /> : <IconoEnlace />}
             {m === "archivo" ? "Subir archivo" : "Pegar link"}
           </button>
         ))}
@@ -83,12 +92,18 @@ export function FormularioNuevo() {
             disabled={enviando}
             onChange={(e) => setArchivo(e.target.files?.[0] ?? null)}
           />
+          <span className="zona-icono" aria-hidden>
+            <IconoSubir />
+          </span>
           {archivo ? (
             <span>
               <strong>{archivo.name}</strong> · {formatoMB(archivo.size)}
             </span>
           ) : (
-            <span>Arrastra un video aquí o haz clic para elegirlo</span>
+            <span>
+              <strong>Arrastra un video aquí</strong>
+              <br />o haz clic para elegirlo
+            </span>
           )}
         </label>
       ) : (
@@ -123,7 +138,8 @@ export function FormularioNuevo() {
         </div>
       )}
 
-      <button type="submit" className="primario" disabled={!listo || enviando || idiomas.length === 0}>
+      <button type="submit" className="primario grande" disabled={!listo || enviando || idiomas.length === 0}>
+        {!enviando && <IconoTraducir />}
         {enviando ? (modo === "archivo" ? `Subiendo… ${Math.round(subida * 100)}%` : "Registrando…") : "Traducir"}
       </button>
     </form>
