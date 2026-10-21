@@ -125,3 +125,16 @@ export const IconoAbrir = () => (
     <path d="M7 17 17 7M9 7h8v8" />
   </Icono>
 );
+
+export const IconoCopiar = () => (
+  <Icono>
+    <rect x="8" y="8" width="12" height="12" rx="2.5" />
+    <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
+  </Icono>
+);
+
+export const IconoCheck = () => (
+  <Icono>
+    <path d="m5 12 5 5 9-10" />
+  </Icono>
+);

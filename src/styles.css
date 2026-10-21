@@ -505,7 +505,50 @@ input:focus, select:focus { outline: none; border-color: var(--acento); box-shad
    ========================================================= */
 .vista-cabecera { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin: 1rem 0 1.25rem; }
 .vista-cabecera h1 { overflow-wrap: anywhere; }
-.ruta-idiomas { display: flex; align-items: center; gap: 0.4rem; margin: 0.3rem 0 0; color: var(--texto-sutil); }
+.ruta-idiomas { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; margin: 0.4rem 0 0; color: var(--texto-sutil); }
+
+/* Botón "Ver URL" con aspecto de chip */
+.chip-boton {
+  gap: 0.3rem;
+  margin-left: 0.35rem;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--borde);
+  color: var(--texto-sutil);
+  cursor: pointer;
+}
+.chip-boton:hover, .chip-boton[aria-expanded="true"] { background: var(--acento-suave); color: var(--acento); border-color: transparent; }
+.chip-boton svg { width: 13px; height: 13px; }
+
+/* Panel con la URL completa */
+.panel-url {
+  flex-basis: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 720px;
+  margin-top: 0.35rem;
+  padding: 0.35rem 0.35rem 0.35rem 0.85rem;
+  background: var(--vidrio);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  border: 1px solid var(--borde);
+  border-radius: 14px;
+  box-shadow: var(--sombra);
+  animation: aparecer 0.16s ease-out;
+}
+.panel-url code {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem;
+  color: var(--texto);
+  user-select: all;
+}
+.barra-flotante.compacta-linea { padding: 2px; border-radius: 12px; box-shadow: none; }
+.barra-flotante.compacta-linea .boton-icono { width: 34px; height: 34px; }
+a.boton-icono { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
 .vista-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 1.25rem; align-items: start; }
 @media (max-width: 900px) { .vista-cuerpo { grid-template-columns: minmax(0, 1fr); } }
 

@@ -5,7 +5,9 @@ import { formatoTiempo } from "../vtt";
 import { BarraProgreso } from "./BarraProgreso";
 import { EstadoBadge } from "./EstadoBadge";
 import { IconoDescargar, IconoReintentar } from "./Iconos";
+import { tituloVideo } from "../nombres";
 import { ReproductorSubtitulado } from "./ReproductorSubtitulado";
+import { VerUrl } from "./VerUrl";
 
 export function VistaVideo({ id }: { id: string }) {
   const { detalle, estado, cues, error, reiniciar } = useEstadoVideo(id);
@@ -81,15 +83,16 @@ export function VistaVideo({ id }: { id: string }) {
     <section className="vista-video">
       <header className="vista-cabecera">
         <div>
-          <h1 title={detalle.nombre}>{detalle.nombre}</h1>
-          <p className="ruta-idiomas">
+          <h1>{tituloVideo(detalle)}</h1>
+          <div className="ruta-idiomas">
             {estado.idioma_origen && (
               <>
                 <span className="chip">{estado.idioma_origen.toUpperCase()}</span>→
               </>
             )}
             <span className="chip chip-acento">{estado.idioma_destino.toUpperCase()}</span>
-          </p>
+            {detalle.origen_url && <VerUrl url={detalle.origen_url} />}
+          </div>
         </div>
         <EstadoBadge estado={estado.estado} />
       </header>
