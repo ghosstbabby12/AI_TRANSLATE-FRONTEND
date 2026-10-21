@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type FormatoSubtitulos, type VideoHistorial } from "../api";
 import { navegar } from "../hooks/useRuta";
+import { tituloVideo } from "../nombres";
 import { EstadoBadge } from "./EstadoBadge";
 import { IconoAbrir, IconoDescargar, IconoVideo } from "./Iconos";
 
@@ -73,7 +74,7 @@ export function Historial() {
                     <IconoVideo />
                     <span className="chip chip-acento">{v.idioma_destino.toUpperCase()}</span>
                   </span>
-                  <strong title={v.nombre}>{v.nombre}</strong>
+                  <strong title={tituloVideo(v)}>{tituloVideo(v)}</strong>
                   <span className="sutil">
                     {fecha.format(new Date(v.creado_en))}
                     {total > 0 && ` · ${v.segmentos_listos}/${total} segmentos`}
