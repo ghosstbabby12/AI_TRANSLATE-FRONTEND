@@ -5,7 +5,8 @@ const BASE = (import.meta.env.VITE_API_URL ?? "http://localhost:3000").replace(/
 
 export type EstadoVideo = "pendiente" | "procesando" | "completo" | "error";
 export type EstadoSegmento = "pendiente" | "procesando" | "listo" | "error";
-export type FormatoSubtitulos = "srt" | "vtt";
+export type FormatoSubtitulos = "srt" | "vtt" | "txt";
+export type EstadoExportacion = "procesando" | "listo" | "error";
 
 export interface Idioma {
   codigo: string;
@@ -32,6 +33,10 @@ export interface VideoHistorial extends Video {
 
 export interface VideoDetalle extends Video {
   url_reproduccion: string | null;
+  /** Video con subtítulos incrustados (se genera bajo demanda). */
+  export_estado: EstadoExportacion | null;
+  export_error: string | null;
+  url_exportacion: string | null;
 }
 
 export interface SegmentoEstado {
@@ -190,6 +195,8 @@ export const api = {
   estado: (id: string, signal?: AbortSignal) => json<EstadoRespuesta>(`/videos/${id}/estado`, { signal }),
   subtitulosVtt: async (id: string, signal?: AbortSignal) =>
     (await pedir(`/videos/${id}/subtitulos?formato=vtt`, { signal })).text(),
+  /** Pide generar el video con subtítulos incrustados (trabajo en segundo plano). */
+  exportarVideo: (id: string) => json<{ export_estado: EstadoExportacion }>(`/videos/${id}/exportar`, { method: "POST" }),
   reintentar: (id: string) => json<{ reencolados: number; video?: boolean }>(`/videos/${id}/reintentar`, { method: "POST" }),
 
   crearDesdeUrl: (url: string, idiomaDestino: string) =>
