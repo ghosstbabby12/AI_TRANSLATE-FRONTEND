@@ -159,6 +159,7 @@ export function VistaVideo({ id }: { id: string }) {
         <div className="columna-principal">
           <ReproductorSubtitulado
             url={detalle.url_reproduccion}
+            portada={detalle.url_miniatura}
             cues={cues}
             segmentos={estado.segmentos}
             videoRef={videoRef}

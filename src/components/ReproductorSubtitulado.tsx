@@ -5,6 +5,8 @@ import { IconoContraer, IconoExpandir } from "./Iconos";
 
 interface Props {
   url: string | null;
+  /** Fotograma que se muestra antes de dar play. */
+  portada?: string | null;
   cues: Cue[];
   segmentos: SegmentoEstado[];
   videoRef: RefObject<HTMLVideoElement | null>;
@@ -20,7 +22,7 @@ interface Props {
  * <track>: así se actualizan al instante cuando llegan segmentos nuevos (un
  * <track> no relee su archivo) y se puede avisar qué tramo aún se traduce.
  */
-export function ReproductorSubtitulado({ url, cues, segmentos, videoRef, onTiempo, acciones, terminado }: Props) {
+export function ReproductorSubtitulado({ url, portada, cues, segmentos, videoRef, onTiempo, acciones, terminado }: Props) {
   const contenedor = useRef<HTMLDivElement>(null);
   const [tiempo, setTiempo] = useState(0);
   const [pantallaCompleta, setPantallaCompleta] = useState(false);
@@ -69,6 +71,7 @@ export function ReproductorSubtitulado({ url, cues, segmentos, videoRef, onTiemp
       <video
         ref={videoRef}
         src={url}
+        poster={portada ?? undefined}
         controls
         controlsList="nofullscreen"
         playsInline
