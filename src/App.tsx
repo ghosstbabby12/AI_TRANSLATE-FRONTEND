@@ -5,14 +5,18 @@ import { IconoHistorial, IconoMas, IconoTraducir } from "./components/Iconos";
 import { Logo } from "./components/Logo";
 import { MenuUsuario } from "./components/MenuUsuario";
 import { PantallaAcceso } from "./components/PantallaAcceso";
+import { PantallaEspera, PantallaSinConexion } from "./components/PantallaEspera";
 import { VistaVideo } from "./components/VistaVideo";
 import { navegar, useRuta } from "./hooks/useRuta";
 
 export function App() {
-  const { usuario, cargando, cerrarSesion } = useAuth();
+  const { usuario, cargando, errorConexion, reintentarConexion, cerrarSesion } = useAuth();
   const ruta = useRuta();
 
-  if (cargando) return <p className="sutil centrado cargando">Cargando…</p>;
+  if (cargando) return <PantallaEspera />;
+  if (!usuario && errorConexion) {
+    return <PantallaSinConexion mensaje={errorConexion} onReintentar={reintentarConexion} onCambiarCuenta={cerrarSesion} />;
+  }
   if (!usuario) return <PantallaAcceso />;
 
   return (

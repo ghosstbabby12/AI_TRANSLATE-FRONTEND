@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "../auth";
 import { Logo } from "./Logo";
 import { SelectorTema } from "./SelectorTema";
@@ -14,8 +14,16 @@ export function PantallaAcceso() {
   const [verPassword, setVerPassword] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lento, setLento] = useState(false);
 
   const esRegistro = modo === "registro";
+
+  // Si el envío tarda, lo más probable es que la API esté despertando.
+  useEffect(() => {
+    if (!enviando) return setLento(false);
+    const t = setTimeout(() => setLento(true), 5_000);
+    return () => clearTimeout(t);
+  }, [enviando]);
 
   async function enviar(e: FormEvent) {
     e.preventDefault();
@@ -100,6 +108,11 @@ export function PantallaAcceso() {
         </label>
 
         {error && <p className="error">{error}</p>}
+        {lento && (
+          <p className="aviso-suave">
+            El servidor está despertando; la primera vez puede tardar hasta un minuto.
+          </p>
+        )}
 
         <button type="submit" className="primario grande" disabled={enviando}>
           {enviando ? "Un momento…" : esRegistro ? "Crear cuenta" : "Entrar"}
