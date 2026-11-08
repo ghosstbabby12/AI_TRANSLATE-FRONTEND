@@ -145,3 +145,17 @@ export const IconoPelicula = () => (
     <path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4" />
   </Icono>
 );
+
+export const IconoReloj = () => (
+  <Icono>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 2" />
+  </Icono>
+);
+
+export const IconoGlobo = () => (
+  <Icono>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+  </Icono>
+);

@@ -1,7 +1,9 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { api, type Idioma } from "../api";
 import { navegar } from "../hooks/useRuta";
-import { IconoEnlace, IconoSubir, IconoTraducir } from "./Iconos";
+import { bandera, capitalizar } from "../banderas";
+import { IconoDescargar, IconoEnlace, IconoGlobo, IconoMas, IconoReloj, IconoSubir, IconoTraducir } from "./Iconos";
+import { IlustracionArchivos } from "./IlustracionArchivos";
 
 type Modo = "archivo" | "url";
 
@@ -41,107 +43,149 @@ export function FormularioNuevo() {
   }
 
   return (
-    <form className="tarjeta formulario" onSubmit={enviar}>
-      <div className="formulario-cabecera">
-        <span className="icono-grande" aria-hidden>
-          <IconoTraducir />
+    <section className="inicio">
+      <header className="hero">
+        <span className="hero-etiqueta">
+          <IconoTraducir /> Subtítulos con IA
         </span>
-        <div>
-          <h1>Traducir un video</h1>
-          <p className="sutil">
-            Sube un archivo o pega el link de un video público. Verás los subtítulos traducidos a medida que se generan.
-          </p>
-        </div>
-      </div>
+        <h1 className="hero-titulo">
+          Traductor de video <span className="texto-degradado">con IA</span>
+        </h1>
+        <p className="hero-subtitulo">
+          Transcribe y traduce cualquier video, desde un archivo o un enlace. Los subtítulos aparecen en tiempo real
+          mientras se procesa.
+        </p>
+      </header>
 
-      <div className="pestanas" role="tablist">
-        {(["archivo", "url"] as const).map((m) => (
-          <button
-            key={m}
-            type="button"
-            role="tab"
-            aria-selected={modo === m}
-            className={modo === m ? "activa" : ""}
-            onClick={() => setModo(m)}
-            disabled={enviando}
-          >
-            {m === "archivo" ? <IconoSubir /> : <IconoEnlace />}
-            {m === "archivo" ? "Subir archivo" : "Pegar link"}
-          </button>
-        ))}
-      </div>
-
-      {modo === "archivo" ? (
-        <label
-          className={`zona-archivo ${arrastrando ? "arrastrando" : ""}`}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setArrastrando(true);
-          }}
-          onDragLeave={() => setArrastrando(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setArrastrando(false);
-            const f = e.dataTransfer.files[0];
-            if (f) setArchivo(f);
-          }}
-        >
-          <input
-            type="file"
-            accept="video/*,audio/*"
-            disabled={enviando}
-            onChange={(e) => setArchivo(e.target.files?.[0] ?? null)}
-          />
-          <span className="zona-icono" aria-hidden>
-            <IconoSubir />
-          </span>
-          {archivo ? (
-            <span>
-              <strong>{archivo.name}</strong> · {formatoMB(archivo.size)}
-            </span>
-          ) : (
-            <span>
-              <strong>Arrastra un video aquí</strong>
-              <br />o haz clic para elegirlo
-            </span>
-          )}
-        </label>
-      ) : (
-        <label className="campo">
-          Link del video
-          <input
-            type="url"
-            placeholder="https://www.youtube.com/watch?v=…"
-            value={url}
-            disabled={enviando}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-        </label>
-      )}
-
-      <label className="campo">
-        Traducir al
-        <select value={idioma} onChange={(e) => setIdioma(e.target.value)} disabled={enviando}>
-          {idiomas.map((i) => (
-            <option key={i.codigo} value={i.codigo}>
-              {i.nombre}
-            </option>
+      <form className="tarjeta formulario" onSubmit={enviar}>
+        <div className="pestanas" role="tablist">
+          {(["archivo", "url"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              role="tab"
+              aria-selected={modo === m}
+              className={modo === m ? "activa" : ""}
+              onClick={() => setModo(m)}
+              disabled={enviando}
+            >
+              {m === "archivo" ? <IconoSubir /> : <IconoEnlace />}
+              {m === "archivo" ? "Archivo local" : "Enlace en línea"}
+            </button>
           ))}
-        </select>
-      </label>
-
-      {error && <p className="error">{error}</p>}
-
-      {enviando && modo === "archivo" && (
-        <div className="progreso-barra" role="progressbar" aria-valuenow={Math.round(subida * 100)}>
-          <div className="progreso-relleno" style={{ width: `${subida * 100}%` }} />
         </div>
-      )}
 
-      <button type="submit" className="primario grande" disabled={!listo || enviando || idiomas.length === 0}>
-        {!enviando && <IconoTraducir />}
-        {enviando ? (modo === "archivo" ? `Subiendo… ${Math.round(subida * 100)}%` : "Registrando…") : "Traducir"}
-      </button>
-    </form>
+        {modo === "archivo" ? (
+          <label
+            className={`zona-archivo ${arrastrando ? "arrastrando" : ""} ${archivo ? "con-archivo" : ""}`}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setArrastrando(true);
+            }}
+            onDragLeave={() => setArrastrando(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setArrastrando(false);
+              const f = e.dataTransfer.files[0];
+              if (f) setArchivo(f);
+            }}
+          >
+            <input
+              type="file"
+              accept="video/*,audio/*"
+              disabled={enviando}
+              onChange={(e) => setArchivo(e.target.files?.[0] ?? null)}
+            />
+            <IlustracionArchivos />
+            {archivo ? (
+              <>
+                <strong className="zona-titulo">{archivo.name}</strong>
+                <span className="zona-texto">{formatoMB(archivo.size)} · Haz clic para cambiarlo</span>
+              </>
+            ) : (
+              <>
+                <strong className="zona-titulo">Sube un video o audio</strong>
+                <span className="zona-texto">Arrástralo aquí o elígelo desde tu dispositivo</span>
+                <span className="boton-falso" aria-hidden>
+                  <IconoMas /> Elegir archivo
+                </span>
+              </>
+            )}
+          </label>
+        ) : (
+          <div className="zona-enlace">
+            <IlustracionArchivos />
+            <strong className="zona-titulo">Traduce desde un enlace</strong>
+            <span className="zona-texto">YouTube, Vimeo, Wikimedia o un enlace directo a un archivo de video</span>
+            <label className="campo-enlace">
+              <IconoEnlace />
+              <input
+                type="url"
+                placeholder="https://…"
+                aria-label="Enlace del video"
+                value={url}
+                disabled={enviando}
+                onChange={(e) => setUrl(e.target.value)}
+              />
+            </label>
+          </div>
+        )}
+
+        {enviando && modo === "archivo" && (
+          <div className="progreso-barra" role="progressbar" aria-valuenow={Math.round(subida * 100)}>
+            <div className="progreso-relleno" style={{ width: `${subida * 100}%` }} />
+          </div>
+        )}
+
+        <div className="formulario-pie">
+          <label className="campo campo-idioma">
+            Traducir al
+            <select value={idioma} onChange={(e) => setIdioma(e.target.value)} disabled={enviando}>
+              {idiomas.map((i) => (
+                <option key={i.codigo} value={i.codigo}>
+                  {bandera(i.codigo)} {capitalizar(i.nombre)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button type="submit" className="primario grande" disabled={!listo || enviando || idiomas.length === 0}>
+            {!enviando && <IconoTraducir />}
+            {enviando ? (modo === "archivo" ? `Subiendo… ${Math.round(subida * 100)}%` : "Registrando…") : "Traducir video"}
+          </button>
+        </div>
+
+        {error && <p className="error">{error}</p>}
+      </form>
+
+      <ul className="ventajas">
+        <li>
+          <span className="ventaja-icono" aria-hidden>
+            <IconoReloj />
+          </span>
+          <div>
+            <strong>En tiempo real</strong>
+            <span>Cada segmento aparece en cuanto está traducido.</span>
+          </div>
+        </li>
+        <li>
+          <span className="ventaja-icono" aria-hidden>
+            <IconoDescargar />
+          </span>
+          <div>
+            <strong>Descarga como quieras</strong>
+            <span>SRT, VTT, TXT o el MP4 con subtítulos incrustados.</span>
+          </div>
+        </li>
+        <li>
+          <span className="ventaja-icono" aria-hidden>
+            <IconoGlobo />
+          </span>
+          <div>
+            <strong>{idiomas.length || 9} idiomas</strong>
+            <span>Detecta el idioma original automáticamente.</span>
+          </div>
+        </li>
+      </ul>
+    </section>
   );
 }
