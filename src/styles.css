@@ -717,3 +717,16 @@ a.boton-icono { display: inline-flex; align-items: center; justify-content: cent
   font-size: 0.88rem;
 }
 .reproductor-nota { font-size: 0.88rem; opacity: 0.75; max-width: 80%; text-align: center; }
+
+/* =========================================================
+   Descarga del video con subtítulos
+   ========================================================= */
+.tarjeta-descarga { margin-top: 1rem; padding: 1rem 1.25rem; }
+.descarga-video { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.descarga-video-texto { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.descarga-video-texto .sutil, .descarga-video-texto .error { margin: 0; font-size: 0.86rem; }
+.descarga-video button { flex-shrink: 0; }
+.cargador-boton { width: 16px; height: 16px; border-width: 2px; border-color: rgb(255 255 255 / 0.35); border-top-color: currentColor; }
+@media (max-width: 520px) {
+  .descarga-video { flex-direction: column; align-items: stretch; }
+}

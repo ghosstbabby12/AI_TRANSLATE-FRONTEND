@@ -3,6 +3,7 @@ import { api, type FormatoSubtitulos } from "../api";
 import { useEstadoVideo } from "../hooks/useEstadoVideo";
 import { formatoTiempo } from "../vtt";
 import { BarraProgreso } from "./BarraProgreso";
+import { DescargaVideo } from "./DescargaVideo";
 import { EstadoBadge } from "./EstadoBadge";
 import { IconoDescargar, IconoReintentar } from "./Iconos";
 import { tituloVideo } from "../nombres";
@@ -50,13 +51,13 @@ export function VistaVideo({ id }: { id: string }) {
 
   const acciones = (
     <>
-      {(["srt", "vtt"] as const).map((f) => (
+      {(["srt", "vtt", "txt"] as const).map((f) => (
         <button
           key={f}
           type="button"
           className="boton-icono con-texto"
-          data-tip={`Descargar subtítulos .${f}`}
-          aria-label={`Descargar subtítulos .${f}`}
+          data-tip={f === "txt" ? "Descargar transcripción .txt" : `Descargar subtítulos .${f}`}
+          aria-label={f === "txt" ? "Descargar transcripción .txt" : `Descargar subtítulos .${f}`}
           disabled={sinSubtitulos}
           onClick={() => descargar(f)}
         >
@@ -114,6 +115,11 @@ export function VistaVideo({ id }: { id: string }) {
           <div className="tarjeta tarjeta-progreso">
             <BarraProgreso estado={estado} tiempoActual={tiempo} onBuscar={buscar} />
           </div>
+          {detalle.url_reproduccion && (
+            <div className="tarjeta tarjeta-descarga">
+              <DescargaVideo id={id} estadoInicial={detalle.export_estado} deshabilitado={sinSubtitulos} />
+            </div>
+          )}
           {accion && <p className="sutil">{accion}</p>}
         </div>
 
