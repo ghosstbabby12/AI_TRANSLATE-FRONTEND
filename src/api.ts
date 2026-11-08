@@ -31,8 +31,16 @@ export interface VideoHistorial extends Video {
   segmentos_listos: number;
 }
 
+export interface TraduccionResumen {
+  id: string;
+  idioma_destino: string;
+  estado: EstadoVideo;
+}
+
 export interface VideoDetalle extends Video {
   url_reproduccion: string | null;
+  /** Todas las traducciones del mismo archivo (incluida esta). */
+  traducciones: TraduccionResumen[];
   /** Video con subtítulos incrustados (se genera bajo demanda). */
   export_estado: EstadoExportacion | null;
   export_error: string | null;
@@ -195,6 +203,13 @@ export const api = {
   estado: (id: string, signal?: AbortSignal) => json<EstadoRespuesta>(`/videos/${id}/estado`, { signal }),
   subtitulosVtt: async (id: string, signal?: AbortSignal) =>
     (await pedir(`/videos/${id}/subtitulos?formato=vtt`, { signal })).text(),
+  /** Traduce los subtítulos ya generados a otro idioma (reutiliza la transcripción). */
+  traducirA: (id: string, idiomaDestino: string) =>
+    json<{ id: string; existente: boolean }>(`/videos/${id}/traducir`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idioma_destino: idiomaDestino }),
+    }),
   /** Pide generar el video con subtítulos incrustados (trabajo en segundo plano). */
   exportarVideo: (id: string) => json<{ export_estado: EstadoExportacion }>(`/videos/${id}/exportar`, { method: "POST" }),
   reintentar: (id: string) => json<{ reencolados: number; video?: boolean }>(`/videos/${id}/reintentar`, { method: "POST" }),
