@@ -23,6 +23,7 @@ export function useEstadoVideo(id: string) {
     const { signal } = control;
     let temporizador: ReturnType<typeof setTimeout> | undefined;
     let urlLista = false;
+    let intentosSinUrl = 0;
     listosVistos.current = -1;
 
     async function tick() {
@@ -44,10 +45,11 @@ export function useEstadoVideo(id: string) {
           setDetalle(det);
         }
 
-        // Se sigue consultando mientras haya trabajo o falte la URL del video
-        // (un video en error ya no va a conseguirla).
+        // Se sigue consultando mientras haya trabajo o falte la URL del video.
+        // Un video terminado sin URL tras varios intentos no la va a tener
+        // (p. ej. un error al guardar el original): no se insiste para siempre.
         if (est.estado === "pendiente" || est.estado === "procesando") programar();
-        else if (est.estado === "completo" && !urlLista) programar();
+        else if (est.estado === "completo" && !urlLista && ++intentosSinUrl <= 5) programar();
       } catch (e) {
         if (signal.aborted) return;
         setError(e instanceof Error ? e.message : String(e));

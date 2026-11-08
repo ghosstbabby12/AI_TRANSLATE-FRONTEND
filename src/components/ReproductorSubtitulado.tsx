@@ -11,6 +11,8 @@ interface Props {
   onTiempo: (segundos: number) => void;
   /** Botones extra para la barra flotante (descargas, reintentar…). */
   acciones?: ReactNode;
+  /** El procesamiento terminó: si aún no hay URL, ya no va a llegar. */
+  terminado?: boolean;
 }
 
 /**
@@ -18,7 +20,7 @@ interface Props {
  * <track>: así se actualizan al instante cuando llegan segmentos nuevos (un
  * <track> no relee su archivo) y se puede avisar qué tramo aún se traduce.
  */
-export function ReproductorSubtitulado({ url, cues, segmentos, videoRef, onTiempo, acciones }: Props) {
+export function ReproductorSubtitulado({ url, cues, segmentos, videoRef, onTiempo, acciones, terminado }: Props) {
   const contenedor = useRef<HTMLDivElement>(null);
   const [tiempo, setTiempo] = useState(0);
   const [pantallaCompleta, setPantallaCompleta] = useState(false);
@@ -32,8 +34,17 @@ export function ReproductorSubtitulado({ url, cues, segmentos, videoRef, onTiemp
   if (!url) {
     return (
       <div className="reproductor reproductor-vacio">
-        <span className="cargador" aria-hidden />
-        <p>Preparando el video…</p>
+        {terminado ? (
+          <>
+            <p>El video original no está disponible para reproducir.</p>
+            <p className="reproductor-nota">La traducción sí: puedes leerla en el panel o descargar los subtítulos.</p>
+          </>
+        ) : (
+          <>
+            <span className="cargador" aria-hidden />
+            <p>Preparando el video…</p>
+          </>
+        )}
       </div>
     );
   }

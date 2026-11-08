@@ -109,6 +109,7 @@ export function VistaVideo({ id }: { id: string }) {
             videoRef={videoRef}
             onTiempo={setTiempo}
             acciones={acciones}
+            terminado={estado.estado === "completo" || estado.estado === "error"}
           />
           <div className="tarjeta tarjeta-progreso">
             <BarraProgreso estado={estado} tiempoActual={tiempo} onBuscar={buscar} />
