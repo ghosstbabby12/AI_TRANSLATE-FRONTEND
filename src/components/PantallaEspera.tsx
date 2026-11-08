@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useT } from "../i18n";
 import { Logo } from "./Logo";
 
 /**
@@ -7,9 +8,10 @@ import { Logo } from "./Logo";
  */
 export function PantallaEspera() {
   const [lenta, setLenta] = useState(false);
+  const t = useT();
   useEffect(() => {
-    const t = setTimeout(() => setLenta(true), 4_000);
-    return () => clearTimeout(t);
+    const temporizador = setTimeout(() => setLenta(true), 4_000);
+    return () => clearTimeout(temporizador);
   }, []);
 
   return (
@@ -17,8 +19,8 @@ export function PantallaEspera() {
       <div className="tarjeta pantalla-estado">
         <Logo />
         <span className="cargador cargador-acento" aria-hidden />
-        <p>{lenta ? "Despertando el servidor…" : "Cargando…"}</p>
-        {lenta && <p className="sutil">Si estuvo inactivo, puede tardar hasta un minuto la primera vez.</p>}
+        <p>{lenta ? t("conexion.despertando") : t("app.cargando")}</p>
+        {lenta && <p className="sutil">{t("conexion.despertandoDetalle")}</p>}
       </div>
     </main>
   );
@@ -32,17 +34,18 @@ interface PropsSinConexion {
 
 /** El servidor no respondió al abrir la app: la sesión sigue guardada, se puede reintentar. */
 export function PantallaSinConexion({ mensaje, onReintentar, onCambiarCuenta }: PropsSinConexion) {
+  const t = useT();
   return (
     <main className="acceso">
       <div className="tarjeta pantalla-estado">
         <Logo />
-        <h1>No pudimos conectar</h1>
+        <h1>{t("conexion.sinConexionTitulo")}</h1>
         <p className="sutil">{mensaje}</p>
         <button type="button" className="primario grande" onClick={onReintentar}>
-          Reintentar
+          {t("conexion.reintentar")}
         </button>
         <button type="button" className="boton-texto" onClick={onCambiarCuenta}>
-          Entrar con otra cuenta
+          {t("conexion.otraCuenta")}
         </button>
       </div>
     </main>

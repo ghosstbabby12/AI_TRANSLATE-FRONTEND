@@ -1,4 +1,5 @@
 import type { Video } from "./api";
+import { traducir } from "./i18n";
 
 // Segmentos de ruta que no dicen nada del video (youtube.com/watch?v=…, /embed/…)
 const GENERICOS = new Set(["watch", "embed", "video", "videos", "v", "shorts", "file"]);
@@ -55,5 +56,5 @@ export function tituloVideo(video: Pick<Video, "nombre" | "origen_url">): string
 
   // Un identificador (youtu.be/Szox9wD4HRU, vimeo.com/123456) no es un título
   const esId = !/\s/.test(texto) && /\d/.test(texto);
-  return texto.length >= 3 && !esId && !GENERICOS.has(texto.toLowerCase()) ? texto : `Video de ${sitio}`;
+  return texto.length >= 3 && !esId && !GENERICOS.has(texto.toLowerCase()) ? texto : traducir("video.deSitio", { sitio });
 }

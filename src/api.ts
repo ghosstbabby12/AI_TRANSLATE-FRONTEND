@@ -1,5 +1,6 @@
 // Cliente de la API del backend. Los tipos reflejan las respuestas de
 // backend/src/api/routes/videos.routes.ts.
+import { traducir, traducirMensajeServidor, type IdiomaUi } from "./i18n";
 
 const BASE = (import.meta.env.VITE_API_URL ?? "http://localhost:3000").replace(/\/$/, "");
 
@@ -80,7 +81,21 @@ export interface Usuario {
   id: string;
   nombre: string;
   email: string;
+  telefono: string | null;
+  idioma_interfaz: IdiomaUi;
+  /** Foto de perfil (URL temporal firmada); null si no tiene. */
+  url_foto: string | null;
   creado_en: string;
+  actualizado_en: string;
+}
+
+export interface CambiosPerfil {
+  nombre?: string;
+  email?: string;
+  telefono?: string | null;
+  idioma_interfaz?: IdiomaUi;
+  /** Obligatoria solo si cambia el email. */
+  contrasena_actual?: string;
 }
 
 export interface Sesion {
@@ -131,10 +146,19 @@ export class ErrorApi extends Error {
 // El plan gratuito de Render duerme la API tras 15 min sin uso y tarda ~50 s
 // en despertar: el límite lo cubre, pero ninguna petición espera para siempre.
 const TIEMPO_LIMITE_MS = 75_000;
-export const MENSAJE_SIN_RESPUESTA =
-  "El servidor no respondió a tiempo. Si estaba inactivo puede tardar hasta un minuto en despertar; intenta de nuevo.";
-export const MENSAJE_SIN_CONEXION =
-  "No se pudo conectar con el servidor. Revisa tu conexión o intenta de nuevo en un momento.";
+const mensajeSinRespuesta = () => traducir("conexion.sinRespuesta");
+const mensajeSinConexion = () => traducir("conexion.sinRed");
+
+/**
+ * Mensaje de error legible a partir del cuerpo de la respuesta. Si es un error
+ * de validación, se muestra el primer detalle (p. ej. "Teléfono inválido…").
+ */
+function mensajeDeError(cuerpo: unknown, status: number): string {
+  const c = cuerpo as { error?: string; detalles?: Record<string, string[] | undefined> } | null;
+  const detalle = c?.detalles ? Object.values(c.detalles).flat().find(Boolean) : undefined;
+  const mensaje = detalle ?? c?.error;
+  return mensaje ? traducirMensajeServidor(mensaje) : `Error ${status}`;
+}
 
 const esperar = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -165,7 +189,7 @@ async function pedir(ruta: string, init: RequestInit = {}): Promise<Response> {
         await esperar(2_000 * (intento + 1));
         continue;
       }
-      throw new ErrorApi(porTiempo ? MENSAJE_SIN_RESPUESTA : MENSAJE_SIN_CONEXION, 0);
+      throw new ErrorApi(porTiempo ? mensajeSinRespuesta() : mensajeSinConexion(), 0);
     }
 
     if (reintentable && intento < 2 && [502, 503, 504].includes(res.status)) {
@@ -176,7 +200,7 @@ async function pedir(ruta: string, init: RequestInit = {}): Promise<Response> {
     if (res.status === 401 && token) alExpirar();
     if (!res.ok) {
       const cuerpo = await res.json().catch(() => null);
-      throw new ErrorApi(cuerpo?.error ?? `Error ${res.status}`, res.status);
+      throw new ErrorApi(mensajeDeError(cuerpo, res.status), res.status);
     }
     return res;
   }
@@ -199,6 +223,29 @@ export const api = {
   registro: (nombre: string, email: string, password: string) =>
     acceder("/auth/registro", { nombre, email, password }),
   yo: () => json<Usuario>("/auth/yo"),
+
+  // Perfil
+  perfil: () => json<Usuario>("/perfil"),
+  actualizarPerfil: (cambios: CambiosPerfil) =>
+    json<Usuario>("/perfil", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(cambios),
+    }),
+  /** Responde 204 (sin cuerpo). */
+  cambiarContrasena: async (actual: string, nueva: string) => {
+    await pedir("/perfil/contrasena", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ actual, nueva }),
+    });
+  },
+  subirFoto: (foto: File) => {
+    const form = new FormData();
+    form.append("foto", foto);
+    return json<Usuario>("/perfil/foto", { method: "POST", body: form });
+  },
+  quitarFoto: () => json<Usuario>("/perfil/foto", { method: "DELETE" }),
 
   idiomas: () => json<Idioma[]>("/idiomas"),
   listarVideos: () => json<VideoHistorial[]>("/videos"),
@@ -250,7 +297,7 @@ export const api = {
       if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
       xhr.upload.onprogress = (e) => e.lengthComputable && onProgreso(e.loaded / e.total);
       xhr.onload = () => {
-        let cuerpo: { error?: string } | Video | null = null;
+        let cuerpo: unknown = null;
         try {
           cuerpo = JSON.parse(xhr.responseText);
         } catch {
@@ -258,9 +305,9 @@ export const api = {
         }
         if (xhr.status === 401 && token) alExpirar();
         if (xhr.status >= 200 && xhr.status < 300) resolve(cuerpo as Video);
-        else reject(new ErrorApi((cuerpo as { error?: string })?.error ?? `Error ${xhr.status}`, xhr.status));
+        else reject(new ErrorApi(mensajeDeError(cuerpo, xhr.status), xhr.status));
       };
-      xhr.onerror = () => reject(new ErrorApi(MENSAJE_SIN_CONEXION, 0));
+      xhr.onerror = () => reject(new ErrorApi(mensajeSinConexion(), 0));
       xhr.send(form);
     }),
 

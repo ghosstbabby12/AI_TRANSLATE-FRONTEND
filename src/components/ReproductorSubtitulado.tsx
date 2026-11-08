@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import type { SegmentoEstado } from "../api";
+import { useT } from "../i18n";
 import { cueEn, type Cue } from "../vtt";
 import { IconoContraer, IconoExpandir } from "./Iconos";
 
@@ -26,6 +27,7 @@ export function ReproductorSubtitulado({ url, portada, cues, segmentos, videoRef
   const contenedor = useRef<HTMLDivElement>(null);
   const [tiempo, setTiempo] = useState(0);
   const [pantallaCompleta, setPantallaCompleta] = useState(false);
+  const t = useT();
 
   useEffect(() => {
     const alCambiar = () => setPantallaCompleta(document.fullscreenElement === contenedor.current);
@@ -38,13 +40,13 @@ export function ReproductorSubtitulado({ url, portada, cues, segmentos, videoRef
       <div className="reproductor reproductor-vacio">
         {terminado ? (
           <>
-            <p>El video original no está disponible para reproducir.</p>
-            <p className="reproductor-nota">La traducción sí: puedes leerla en el panel o descargar los subtítulos.</p>
+            <p>{t("video.noDisponible")}</p>
+            <p className="reproductor-nota">{t("video.noDisponibleNota")}</p>
           </>
         ) : (
           <>
             <span className="cargador" aria-hidden />
-            <p>Preparando el video…</p>
+            <p>{t("video.preparando")}</p>
           </>
         )}
       </div>
@@ -56,9 +58,9 @@ export function ReproductorSubtitulado({ url, portada, cues, segmentos, videoRef
   const traduciendo = !cue && tramo && (tramo.estado === "pendiente" || tramo.estado === "procesando");
 
   const actualizar = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-    const t = e.currentTarget.currentTime;
-    setTiempo(t);
-    onTiempo(t);
+    const segundos = e.currentTarget.currentTime;
+    setTiempo(segundos);
+    onTiempo(segundos);
   };
 
   // La pantalla completa nativa del <video> ocultaría la capa de subtítulos,
@@ -79,17 +81,17 @@ export function ReproductorSubtitulado({ url, portada, cues, segmentos, videoRef
         onSeeked={actualizar}
       />
       <div className="subtitulo" aria-live="polite">
-        {cue ? <span>{cue.texto}</span> : traduciendo ? <span className="traduciendo">Traduciendo este tramo…</span> : null}
+        {cue ? <span>{cue.texto}</span> : traduciendo ? <span className="traduciendo">{t("video.traduciendoTramo")}</span> : null}
       </div>
 
       {/* Barra flotante de acciones sobre el video */}
-      <div className="barra-flotante" role="toolbar" aria-label="Acciones del video">
+      <div className="barra-flotante" role="toolbar" aria-label={t("video.acciones")}>
         {acciones}
         <button
           type="button"
           className="boton-icono"
-          data-tip={pantallaCompleta ? "Salir de pantalla completa" : "Pantalla completa"}
-          aria-label={pantallaCompleta ? "Salir de pantalla completa" : "Pantalla completa"}
+          data-tip={pantallaCompleta ? t("video.salirPantallaCompleta") : t("video.pantallaCompleta")}
+          aria-label={pantallaCompleta ? t("video.salirPantallaCompleta") : t("video.pantallaCompleta")}
           onClick={alternarPantallaCompleta}
         >
           {pantallaCompleta ? <IconoContraer /> : <IconoExpandir />}

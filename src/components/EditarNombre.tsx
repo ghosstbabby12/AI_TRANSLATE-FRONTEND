@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useT } from "../i18n";
 
 interface Props {
   nombreActual: string;
@@ -11,11 +12,12 @@ export function EditarNombre({ nombreActual, onGuardar, onCancelar }: Props) {
   const [nombre, setNombre] = useState(nombreActual);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const t = useT();
 
   async function guardar(e: FormEvent) {
     e.preventDefault();
     const limpio = nombre.trim();
-    if (!limpio) return setError("Escribe un nombre.");
+    if (!limpio) return setError(t("editar.escribeNombre"));
     if (limpio === nombreActual) return onCancelar();
     setGuardando(true);
     setError(null);
@@ -31,7 +33,7 @@ export function EditarNombre({ nombreActual, onGuardar, onCancelar }: Props) {
     <form className="editar-nombre" onSubmit={guardar} onKeyDown={(e) => e.key === "Escape" && onCancelar()}>
       <input
         autoFocus
-        aria-label="Nombre del video"
+        aria-label={t("editar.nombreVideo")}
         value={nombre}
         maxLength={200}
         disabled={guardando}
@@ -40,10 +42,10 @@ export function EditarNombre({ nombreActual, onGuardar, onCancelar }: Props) {
       />
       <div className="editar-nombre-botones">
         <button type="button" className="secundario" onClick={onCancelar} disabled={guardando}>
-          Cancelar
+          {t("comun.cancelar")}
         </button>
         <button type="submit" className="primario" disabled={guardando}>
-          {guardando ? "Guardando…" : "Guardar"}
+          {guardando ? t("comun.guardando") : t("comun.guardar")}
         </button>
       </div>
       {error && <p className="error">{error}</p>}

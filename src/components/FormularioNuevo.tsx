@@ -1,7 +1,8 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { api, type Idioma } from "../api";
 import { navegar } from "../hooks/useRuta";
-import { bandera, capitalizar } from "../banderas";
+import { bandera } from "../banderas";
+import { nombreIdioma, useT } from "../i18n";
 import { IconoDescargar, IconoEnlace, IconoGlobo, IconoMas, IconoReloj, IconoSubir, IconoTraducir } from "./Iconos";
 import { IlustracionArchivos } from "./IlustracionArchivos";
 
@@ -18,9 +19,10 @@ export function FormularioNuevo() {
   const [arrastrando, setArrastrando] = useState(false);
   const [subida, setSubida] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const t = useT();
 
   useEffect(() => {
-    api.idiomas().then(setIdiomas, () => setError("No se pudo conectar con el servidor"));
+    api.idiomas().then(setIdiomas, (e) => setError(e instanceof Error ? e.message : String(e)));
   }, []);
 
   const enviando = subida !== null;
@@ -46,14 +48,13 @@ export function FormularioNuevo() {
     <section className="inicio">
       <header className="hero">
         <span className="hero-etiqueta">
-          <IconoTraducir /> Subtítulos con IA
+          <IconoTraducir /> {t("inicio.etiqueta")}
         </span>
         <h1 className="hero-titulo">
-          Traductor de video <span className="texto-degradado">con IA</span>
+          {t("inicio.titulo")} <span className="texto-degradado">{t("inicio.tituloDestacado")}</span>
         </h1>
         <p className="hero-subtitulo">
-          Transcribe y traduce cualquier video, desde un archivo o un enlace. Los subtítulos aparecen en tiempo real
-          mientras se procesa.
+          {t("inicio.subtitulo")}
         </p>
       </header>
 
@@ -70,7 +71,7 @@ export function FormularioNuevo() {
               disabled={enviando}
             >
               {m === "archivo" ? <IconoSubir /> : <IconoEnlace />}
-              {m === "archivo" ? "Archivo local" : "Enlace en línea"}
+              {m === "archivo" ? t("inicio.archivoLocal") : t("inicio.enlace")}
             </button>
           ))}
         </div>
@@ -100,14 +101,14 @@ export function FormularioNuevo() {
             {archivo ? (
               <>
                 <strong className="zona-titulo">{archivo.name}</strong>
-                <span className="zona-texto">{formatoMB(archivo.size)} · Haz clic para cambiarlo</span>
+                <span className="zona-texto">{t("inicio.cambiarArchivo", { tamano: formatoMB(archivo.size) })}</span>
               </>
             ) : (
               <>
-                <strong className="zona-titulo">Sube un video o audio</strong>
-                <span className="zona-texto">Arrástralo aquí o elígelo desde tu dispositivo</span>
+                <strong className="zona-titulo">{t("inicio.subeVideo")}</strong>
+                <span className="zona-texto">{t("inicio.arrastra")}</span>
                 <span className="boton-falso" aria-hidden>
-                  <IconoMas /> Elegir archivo
+                  <IconoMas /> {t("inicio.elegirArchivo")}
                 </span>
               </>
             )}
@@ -115,14 +116,14 @@ export function FormularioNuevo() {
         ) : (
           <div className="zona-enlace">
             <IlustracionArchivos />
-            <strong className="zona-titulo">Traduce desde un enlace</strong>
-            <span className="zona-texto">YouTube, Vimeo, Wikimedia o un enlace directo a un archivo de video</span>
+            <strong className="zona-titulo">{t("inicio.desdeEnlace")}</strong>
+            <span className="zona-texto">{t("inicio.enlaceDetalle")}</span>
             <label className="campo-enlace">
               <IconoEnlace />
               <input
                 type="url"
                 placeholder="https://…"
-                aria-label="Enlace del video"
+                aria-label={t("inicio.enlaceAria")}
                 value={url}
                 disabled={enviando}
                 onChange={(e) => setUrl(e.target.value)}
@@ -139,18 +140,22 @@ export function FormularioNuevo() {
 
         <div className="formulario-pie">
           <label className="campo campo-idioma">
-            Traducir al
+            {t("inicio.traducirAl")}
             <select value={idioma} onChange={(e) => setIdioma(e.target.value)} disabled={enviando}>
               {idiomas.map((i) => (
                 <option key={i.codigo} value={i.codigo}>
-                  {bandera(i.codigo)} {capitalizar(i.nombre)}
+                  {bandera(i.codigo)} {nombreIdioma(i.codigo)}
                 </option>
               ))}
             </select>
           </label>
           <button type="submit" className="primario grande" disabled={!listo || enviando || idiomas.length === 0}>
             {!enviando && <IconoTraducir />}
-            {enviando ? (modo === "archivo" ? `Subiendo… ${Math.round(subida * 100)}%` : "Registrando…") : "Traducir video"}
+            {enviando
+              ? modo === "archivo"
+                ? t("inicio.subiendo", { porcentaje: Math.round(subida * 100) })
+                : t("inicio.registrando")
+              : t("inicio.traducirVideo")}
           </button>
         </div>
 
@@ -163,8 +168,8 @@ export function FormularioNuevo() {
             <IconoReloj />
           </span>
           <div>
-            <strong>En tiempo real</strong>
-            <span>Cada segmento aparece en cuanto está traducido.</span>
+            <strong>{t("inicio.ventajaVivo")}</strong>
+            <span>{t("inicio.ventajaVivoDetalle")}</span>
           </div>
         </li>
         <li>
@@ -172,8 +177,8 @@ export function FormularioNuevo() {
             <IconoDescargar />
           </span>
           <div>
-            <strong>Descarga como quieras</strong>
-            <span>SRT, VTT, TXT o el MP4 con subtítulos incrustados.</span>
+            <strong>{t("inicio.ventajaDescarga")}</strong>
+            <span>{t("inicio.ventajaDescargaDetalle")}</span>
           </div>
         </li>
         <li>
@@ -181,8 +186,8 @@ export function FormularioNuevo() {
             <IconoGlobo />
           </span>
           <div>
-            <strong>{idiomas.length || 9} idiomas</strong>
-            <span>Detecta el idioma original automáticamente.</span>
+            <strong>{t("inicio.ventajaIdiomas", { n: idiomas.length || 9 })}</strong>
+            <span>{t("inicio.ventajaIdiomasDetalle")}</span>
           </div>
         </li>
       </ul>

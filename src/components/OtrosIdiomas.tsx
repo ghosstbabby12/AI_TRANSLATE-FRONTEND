@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { api, type Idioma, type TraduccionResumen } from "../api";
-import { bandera, capitalizar } from "../banderas";
+import { bandera } from "../banderas";
+import { CLAVE_ESTADO } from "./EstadoBadge";
+import { nombreIdioma, useT } from "../i18n";
 import { navegar } from "../hooks/useRuta";
 import { IconoTraducir } from "./Iconos";
 
@@ -24,13 +26,14 @@ export function OtrosIdiomas({ id, idiomaActual, traducciones, disponible }: Pro
   const [elegido, setElegido] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const t = useT();
 
-  const otras = traducciones.filter((t) => t.id !== id);
-  const yaTraducidos = useMemo(() => new Set(traducciones.map((t) => t.idioma_destino)), [traducciones]);
+  const otras = traducciones.filter((tr) => tr.id !== id);
+  const yaTraducidos = useMemo(() => new Set(traducciones.map((tr) => tr.idioma_destino)), [traducciones]);
 
   useEffect(() => {
     if (!abierto || idiomas.length) return;
-    api.idiomas().then(setIdiomas, () => setError("No se pudo cargar la lista de idiomas."));
+    api.idiomas().then(setIdiomas, () => setError(t("otros.errorIdiomas")));
   }, [abierto, idiomas.length]);
 
   // Por defecto, el primer idioma que aún no tiene traducción
@@ -58,36 +61,36 @@ export function OtrosIdiomas({ id, idiomaActual, traducciones, disponible }: Pro
         className="boton-traducir-otro"
         aria-expanded={abierto}
         disabled={!disponible}
-        title={disponible ? undefined : "Disponible cuando el video termine de prepararse"}
+        title={disponible ? undefined : t("otros.noDisponible")}
         onClick={() => setAbierto((a) => !a)}
       >
         <IconoTraducir />
-        Traducir transcripción a otro idioma
+        {t("otros.boton")}
       </button>
 
       {abierto && (
         <div className="panel-traducir" onKeyDown={(e) => e.key === "Escape" && setAbierto(false)}>
           <select
-            aria-label="Idioma al que traducir la transcripción"
+            aria-label={t("otros.selectorAria")}
             value={elegido}
             onChange={(e) => setElegido(e.target.value)}
             disabled={enviando}
           >
             {idiomas.map((i) => (
               <option key={i.codigo} value={i.codigo} disabled={i.codigo === idiomaActual}>
-                {bandera(i.codigo)} {capitalizar(i.nombre)}
-                {i.codigo === idiomaActual ? " (actual)" : yaTraducidos.has(i.codigo) ? " (ya traducido)" : ""}
+                {bandera(i.codigo)} {nombreIdioma(i.codigo)}
+                {i.codigo === idiomaActual ? t("otros.actual") : yaTraducidos.has(i.codigo) ? t("otros.yaTraducido") : ""}
               </option>
             ))}
           </select>
-          <span className="sutil">Se reutiliza la transcripción: solo se traduce, así que tarda mucho menos.</span>
+          <span className="sutil">{t("otros.nota")}</span>
           {error && <p className="error">{error}</p>}
           <div className="panel-traducir-botones">
             <button type="button" className="secundario" onClick={() => setAbierto(false)} disabled={enviando}>
-              Cancelar
+              {t("comun.cancelar")}
             </button>
             <button type="button" className="primario" onClick={traducir} disabled={!elegido || enviando}>
-              {enviando ? "Un momento…" : yaTraducidos.has(elegido) ? "Ver traducción" : "Traducir"}
+              {enviando ? t("acceso.unMomento") : yaTraducidos.has(elegido) ? t("otros.verTraduccion") : t("otros.traducir")}
             </button>
           </div>
         </div>
@@ -95,10 +98,15 @@ export function OtrosIdiomas({ id, idiomaActual, traducciones, disponible }: Pro
 
       {otras.length > 0 && (
         <div className="otras-traducciones">
-          <span>También en:</span>
-          {otras.map((t) => (
-            <a key={t.id} href={`#/video/${t.id}`} className="chip chip-enlace" title={`Ver la traducción (${t.estado})`}>
-              {bandera(t.idioma_destino)} {t.idioma_destino.toUpperCase()}
+          <span>{t("otros.tambienEn")}</span>
+          {otras.map((tr) => (
+            <a
+              key={tr.id}
+              href={`#/video/${tr.id}`}
+              className="chip chip-enlace"
+              title={t("otros.verTitulo", { estado: t(CLAVE_ESTADO[tr.estado]).toLowerCase() })}
+            >
+              {bandera(tr.idioma_destino)} {tr.idioma_destino.toUpperCase()}
             </a>
           ))}
         </div>

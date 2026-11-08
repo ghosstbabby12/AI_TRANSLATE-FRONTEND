@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api, type EstadoExportacion } from "../api";
+import { traducir, useT } from "../i18n";
 import { IconoPelicula, IconoReintentar } from "./Iconos";
 
 interface Props {
@@ -29,17 +30,18 @@ export function DescargaVideo({ id, estadoInicial, deshabilitado }: Props) {
   const [error, setError] = useState<string | null>(null);
   // Solo se descarga automáticamente si el usuario lo pidió en esta visita.
   const descargarAlTerminar = useRef(false);
+  const t = useT();
 
   // Mientras se genera, se consulta el estado (también si se recargó la página).
   useEffect(() => {
     if (estado !== "procesando") return;
     const control = new AbortController();
-    const t = setInterval(async () => {
+    const temporizador = setInterval(async () => {
       try {
         const det = await api.obtenerVideo(id, control.signal);
         if (det.export_estado === "procesando") return;
         setEstado(det.export_estado);
-        if (det.export_estado === "error") setError(det.export_error ?? "No se pudo generar el video.");
+        if (det.export_estado === "error") setError(det.export_error ?? traducir("descarga.error"));
         if (det.export_estado === "listo" && det.url_exportacion && descargarAlTerminar.current) {
           descargarAlTerminar.current = false;
           descargar(det.url_exportacion);
@@ -50,7 +52,7 @@ export function DescargaVideo({ id, estadoInicial, deshabilitado }: Props) {
     }, INTERVALO_MS);
     return () => {
       control.abort();
-      clearInterval(t);
+      clearInterval(temporizador);
     };
   }, [estado, id]);
 
@@ -74,13 +76,13 @@ export function DescargaVideo({ id, estadoInicial, deshabilitado }: Props) {
   return (
     <div className="descarga-video">
       <div className="descarga-video-texto">
-        <strong>Video con subtítulos</strong>
+        <strong>{t("descarga.titulo")}</strong>
         <span className="sutil">
           {generando
-            ? "Generando… puede tardar unos minutos. Puedes seguir usando la app."
+            ? t("descarga.generandoDetalle")
             : estado === "listo"
-              ? "Listo: MP4 con la traducción incrustada."
-              : "Descarga un MP4 con la traducción incrustada en la imagen."}
+              ? t("descarga.listoDetalle")
+              : t("descarga.detalle")}
         </span>
         {error && <span className="error">{error}</span>}
       </div>
@@ -97,7 +99,7 @@ export function DescargaVideo({ id, estadoInicial, deshabilitado }: Props) {
         ) : (
           <IconoPelicula />
         )}
-        {generando ? "Generando…" : estado === "error" ? "Reintentar" : "Descargar video"}
+        {generando ? t("descarga.generando") : estado === "error" ? t("descarga.reintentar") : t("descarga.descargar")}
       </button>
     </div>
   );

@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { api, type FormatoSubtitulos } from "../api";
 import { useEstadoVideo } from "../hooks/useEstadoVideo";
 import { navegar } from "../hooks/useRuta";
+import { traducirMensajeServidor, useT } from "../i18n";
 import { formatoTiempo } from "../vtt";
 import { BarraProgreso } from "./BarraProgreso";
 import { DescargaVideo } from "./DescargaVideo";
@@ -23,9 +24,10 @@ export function VistaVideo({ id }: { id: string }) {
   const [confirmando, setConfirmando] = useState(false);
   // Nombre cambiado en esta visita (el detalle no se vuelve a pedir al terminar)
   const [nombreLocal, setNombreLocal] = useState<string | null>(null);
+  const t = useT();
 
   if (!estado || !detalle) {
-    return <p className="sutil centrado">{error ?? "Cargando…"}</p>;
+    return <p className="sutil centrado">{error ?? t("app.cargando")}</p>;
   }
 
   const buscar = (segundos: number) => {
@@ -44,7 +46,13 @@ export function VistaVideo({ id }: { id: string }) {
   const reintentar = async () => {
     try {
       const r = await api.reintentar(id);
-      setAccion(r.video ? "Video en cola de nuevo" : `${r.reencolados} segmento${r.reencolados === 1 ? "" : "s"} en cola de nuevo`);
+      setAccion(
+        r.video
+          ? t("video.encolado")
+          : r.reencolados === 1
+            ? t("video.segmentosEncolados.uno")
+            : t("video.segmentosEncolados.otros", { n: r.reencolados }),
+      );
     } catch (e) {
       setAccion(e instanceof Error ? e.message : String(e));
     }
@@ -65,8 +73,8 @@ export function VistaVideo({ id }: { id: string }) {
           key={f}
           type="button"
           className="boton-icono con-texto"
-          data-tip={f === "txt" ? "Transcripción en texto (.txt)" : `Solo subtítulos, archivo de texto (.${f})`}
-          aria-label={f === "txt" ? "Descargar transcripción .txt" : `Descargar subtítulos .${f}`}
+          data-tip={f === "txt" ? t("video.descargarTxt") : t("video.descargarSubtitulos", { formato: f })}
+          aria-label={f === "txt" ? t("video.descargarTxt") : t("video.descargarSubtitulos", { formato: f })}
           disabled={sinSubtitulos}
           onClick={() => descargar(f)}
         >
@@ -78,8 +86,8 @@ export function VistaVideo({ id }: { id: string }) {
         <button
           type="button"
           className="boton-icono"
-          data-tip={estado.progreso.total === 0 ? "Reintentar video" : "Reintentar segmentos fallidos"}
-          aria-label={estado.progreso.total === 0 ? "Reintentar video" : "Reintentar segmentos fallidos"}
+          data-tip={estado.progreso.total === 0 ? t("video.reintentarVideo") : t("video.reintentarSegmentos")}
+          aria-label={estado.progreso.total === 0 ? t("video.reintentarVideo") : t("video.reintentarSegmentos")}
           onClick={reintentar}
         >
           <IconoReintentar />
@@ -121,8 +129,8 @@ export function VistaVideo({ id }: { id: string }) {
           <button
             type="button"
             className="boton-icono"
-            data-tip="Editar nombre"
-            aria-label="Editar nombre"
+            data-tip={t("video.editarNombre")}
+            aria-label={t("video.editarNombre")}
             onClick={() => setEditando(true)}
             disabled={editando}
           >
@@ -131,8 +139,8 @@ export function VistaVideo({ id }: { id: string }) {
           <button
             type="button"
             className="boton-icono boton-peligro"
-            data-tip="Eliminar video"
-            aria-label="Eliminar video"
+            data-tip={t("video.eliminar")}
+            aria-label={t("video.eliminar")}
             onClick={() => setConfirmando(true)}
           >
             <IconoEliminar />
@@ -152,8 +160,8 @@ export function VistaVideo({ id }: { id: string }) {
         />
       )}
 
-      {estado.estado === "error" && estado.error && <p className="error">{estado.error}</p>}
-      {error && <p className="aviso">Sin conexión con el servidor, reintentando… ({error})</p>}
+      {estado.estado === "error" && estado.error && <p className="error">{traducirMensajeServidor(estado.error)}</p>}
+      {error && <p className="aviso">{t("conexion.reintentandoAviso", { error })}</p>}
 
       <div className="vista-cuerpo">
         <div className="columna-principal">
@@ -185,9 +193,9 @@ export function VistaVideo({ id }: { id: string }) {
             traducciones={detalle.traducciones ?? []}
             disponible={estado.progreso.total > 0}
           />
-          <h2>Traducción en vivo</h2>
+          <h2>{t("video.traduccionEnVivo")}</h2>
           {listos.length === 0 ? (
-            <p className="sutil">Los segmentos aparecerán aquí a medida que se traduzcan.</p>
+            <p className="sutil">{t("video.segmentosApareceran")}</p>
           ) : (
             <ol>
               {listos.map((s) => {

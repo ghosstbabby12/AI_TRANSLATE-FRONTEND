@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type FormatoSubtitulos, type VideoHistorial } from "../api";
 import { navegar } from "../hooks/useRuta";
+import { idiomaActual, useT } from "../i18n";
 import { tituloVideo } from "../nombres";
 import { ConfirmarEliminar } from "./ConfirmarEliminar";
 import { EditarNombre } from "./EditarNombre";
@@ -8,13 +9,15 @@ import { EstadoBadge } from "./EstadoBadge";
 import { formatoTiempo } from "../vtt";
 import { IconoAbrir, IconoDescargar, IconoEditar, IconoEliminar, IconoPlay, IconoVideo } from "./Iconos";
 
-const fecha = new Intl.DateTimeFormat("es", { dateStyle: "medium", timeStyle: "short" });
+const formatoFecha = (iso: string) =>
+  new Intl.DateTimeFormat(idiomaActual(), { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
 
 export function Historial() {
   const [videos, setVideos] = useState<VideoHistorial[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [aEliminar, setAEliminar] = useState<VideoHistorial | null>(null);
+  const t = useT();
 
   // Se refresca solo mientras haya algún video en proceso.
   useEffect(() => {
@@ -57,14 +60,14 @@ export function Historial() {
     api.descargarSubtitulos(id, formato).catch((e) => setError(e.message));
 
   if (error && !videos) return <p className="error centrado">{error}</p>;
-  if (!videos) return <p className="sutil centrado">Cargando…</p>;
+  if (!videos) return <p className="sutil centrado">{t("app.cargando")}</p>;
 
   return (
     <section className="historial-vista">
       <header className="titulo-seccion">
-        <h1>Historial</h1>
+        <h1>{t("historial.titulo")}</h1>
         <p className="sutil">
-          {videos.length} video{videos.length === 1 ? "" : "s"} traducido{videos.length === 1 ? "" : "s"}
+          {videos.length === 1 ? t("historial.contador.uno") : t("historial.contador.otros", { n: videos.length })}
         </p>
       </header>
       {error && <p className="error">{error}</p>}
@@ -74,9 +77,9 @@ export function Historial() {
           <span className="icono-grande" aria-hidden>
             <IconoVideo />
           </span>
-          <p>Todavía no has traducido ningún video.</p>
+          <p>{t("historial.vacio")}</p>
           <button type="button" className="primario" onClick={() => navegar("/")}>
-            Traducir el primero
+            {t("historial.traducirPrimero")}
           </button>
         </div>
       ) : (
@@ -107,8 +110,8 @@ export function Historial() {
                   </span>
                   <strong title={tituloVideo(v)}>{tituloVideo(v)}</strong>
                   <span className="sutil">
-                    {fecha.format(new Date(v.creado_en))}
-                    {total > 0 && ` · ${v.segmentos_listos}/${total} segmentos`}
+                    {formatoFecha(v.creado_en)}
+                    {total > 0 && ` · ${t("historial.segmentos", { listos: v.segmentos_listos, total })}`}
                   </span>
                   {v.estado === "procesando" && total > 0 && (
                     <div className="progreso-barra fina">
@@ -131,8 +134,8 @@ export function Historial() {
                       <button
                         type="button"
                         className="boton-icono"
-                        data-tip="Editar nombre"
-                        aria-label={`Editar el nombre de ${tituloVideo(v)}`}
+                        data-tip={t("video.editarNombre")}
+                        aria-label={t("historial.editarAria", { nombre: tituloVideo(v) })}
                         onClick={() => setEditandoId(v.id)}
                       >
                         <IconoEditar />
@@ -140,8 +143,8 @@ export function Historial() {
                       <button
                         type="button"
                         className="boton-icono boton-peligro"
-                        data-tip="Eliminar"
-                        aria-label={`Eliminar ${tituloVideo(v)}`}
+                        data-tip={t("eliminar.eliminar")}
+                        aria-label={t("historial.eliminarAria", { nombre: tituloVideo(v) })}
                         onClick={() => setAEliminar(v)}
                       >
                         <IconoEliminar />
@@ -157,8 +160,8 @@ export function Historial() {
                       key={f}
                       type="button"
                       className="boton-icono con-texto"
-                      data-tip={`Descargar .${f}`}
-                      aria-label={`Descargar subtítulos .${f} de ${v.nombre}`}
+                      data-tip={t("historial.descargarFormato", { formato: f })}
+                      aria-label={t("historial.descargarAria", { formato: f, nombre: tituloVideo(v) })}
                       disabled={sinSubtitulos}
                       onClick={() => descargar(v.id, f)}
                     >
@@ -169,8 +172,8 @@ export function Historial() {
                   <button
                     type="button"
                     className="boton-icono"
-                    data-tip="Abrir"
-                    aria-label={`Abrir ${v.nombre}`}
+                    data-tip={t("historial.abrir")}
+                    aria-label={t("historial.abrirAria", { nombre: tituloVideo(v) })}
                     onClick={() => navegar(`/video/${v.id}`)}
                   >
                     <IconoAbrir />

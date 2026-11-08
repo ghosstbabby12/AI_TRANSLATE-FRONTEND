@@ -1,5 +1,7 @@
 import type { EstadoRespuesta } from "../api";
+import { useT } from "../i18n";
 import { formatoTiempo } from "../vtt";
+import { CLAVE_ESTADO } from "./EstadoBadge";
 
 interface Props {
   estado: EstadoRespuesta;
@@ -16,6 +18,7 @@ export function BarraProgreso({ estado, tiempoActual, onBuscar }: Props) {
   const { progreso, segmentos } = estado;
   const duracion = segmentos.at(-1)?.tiempo_fin ?? 0;
   const preparando = progreso.total === 0;
+  const t = useT();
 
   return (
     <div className="progreso">
@@ -23,9 +26,9 @@ export function BarraProgreso({ estado, tiempoActual, onBuscar }: Props) {
         <span>
           {preparando
             ? estado.estado === "error"
-              ? "No se pudo preparar el video"
-              : "Extrayendo y dividiendo el audio…"
-            : `${progreso.listos} de ${progreso.total} segmentos listos`}
+              ? t("progreso.sinPreparar")
+              : t("progreso.dividiendo")
+            : t("progreso.listos", { listos: progreso.listos, total: progreso.total })}
         </span>
         {!preparando && <strong>{progreso.porcentaje}%</strong>}
       </div>
@@ -41,7 +44,7 @@ export function BarraProgreso({ estado, tiempoActual, onBuscar }: Props) {
       </div>
 
       {segmentos.length > 0 && (
-        <div className="franja" aria-label="Estado de cada segmento">
+        <div className="franja" aria-label={t("progreso.estadoSegmentos")}>
           {segmentos.map((s) => {
             const activo = tiempoActual >= s.tiempo_inicio && tiempoActual < s.tiempo_fin;
             return (
@@ -50,7 +53,7 @@ export function BarraProgreso({ estado, tiempoActual, onBuscar }: Props) {
                 type="button"
                 className={`franja-bloque seg-${s.estado} ${activo ? "activo" : ""}`}
                 style={{ flexGrow: s.tiempo_fin - s.tiempo_inicio }}
-                title={`${formatoTiempo(s.tiempo_inicio)}–${formatoTiempo(s.tiempo_fin)} · ${s.estado}${s.error ? `: ${s.error}` : ""}`}
+                title={`${formatoTiempo(s.tiempo_inicio)}–${formatoTiempo(s.tiempo_fin)} · ${t(CLAVE_ESTADO[s.estado])}${s.error ? `: ${s.error}` : ""}`}
                 onClick={() => onBuscar(s.tiempo_inicio)}
               />
             );
@@ -60,10 +63,12 @@ export function BarraProgreso({ estado, tiempoActual, onBuscar }: Props) {
 
       {progreso.errores > 0 && (
         <p className="aviso">
-          {progreso.errores} segmento{progreso.errores > 1 ? "s" : ""} no se pudo procesar tras varios intentos.
+          {progreso.errores === 1
+            ? t("progreso.errores.uno")
+            : t("progreso.errores.otros", { n: progreso.errores })}
         </p>
       )}
-      {duracion > 0 && <p className="sutil">Duración: {formatoTiempo(duracion)}</p>}
+      {duracion > 0 && <p className="sutil">{t("progreso.duracion", { duracion: formatoTiempo(duracion) })}</p>}
     </div>
   );
 }

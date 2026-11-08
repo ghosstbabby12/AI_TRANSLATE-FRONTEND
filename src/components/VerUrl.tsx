@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useT } from "../i18n";
 import { IconoAbrir, IconoCheck, IconoCopiar, IconoEnlace } from "./Iconos";
 
 /** Botón "Ver URL": la URL de origen queda oculta hasta que se pide. */
 export function VerUrl({ url }: { url: string }) {
   const [abierto, setAbierto] = useState(false);
   const [copiada, setCopiada] = useState(false);
+  const t = useT();
 
   const copiar = async () => {
     try {
@@ -25,7 +27,7 @@ export function VerUrl({ url }: { url: string }) {
         onClick={() => setAbierto((a) => !a)}
       >
         <IconoEnlace />
-        {abierto ? "Ocultar URL" : "Ver URL"}
+        {abierto ? t("video.ocultarUrl") : t("video.verUrl")}
       </button>
 
       {abierto && (
@@ -35,8 +37,8 @@ export function VerUrl({ url }: { url: string }) {
             <button
               type="button"
               className="boton-icono"
-              data-tip={copiada ? "¡Copiada!" : "Copiar URL"}
-              aria-label="Copiar URL"
+              data-tip={copiada ? t("video.urlCopiada") : t("video.copiarUrl")}
+              aria-label={t("video.copiarUrl")}
               onClick={copiar}
             >
               {copiada ? <IconoCheck /> : <IconoCopiar />}
@@ -46,8 +48,8 @@ export function VerUrl({ url }: { url: string }) {
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              data-tip="Abrir en otra pestaña"
-              aria-label="Abrir URL en otra pestaña"
+              data-tip={t("video.abrirOtraPestana")}
+              aria-label={t("video.abrirOtraPestana")}
             >
               <IconoAbrir />
             </a>
