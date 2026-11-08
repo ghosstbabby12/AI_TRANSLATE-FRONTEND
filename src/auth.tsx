@@ -10,25 +10,28 @@ interface ContextoAuth {
   /** El servidor no respondió al validar la sesión guardada (la sesión sigue guardada). */
   errorConexion: string | null;
   reintentarConexion: () => void;
-  iniciarSesion: (email: string, password: string) => Promise<void>;
-  registrarse: (nombre: string, email: string, password: string) => Promise<void>;
+  iniciarSesion: (email: string, password: string, recordar?: boolean) => Promise<void>;
+  registrarse: (nombre: string, email: string, password: string, recordar?: boolean) => Promise<void>;
   cerrarSesion: () => void;
 }
 
 const Contexto = createContext<ContextoAuth | null>(null);
 
+// Con "Recordarme" el token va a localStorage (persiste); sin él, a
+// sessionStorage (se borra al cerrar el navegador).
 function leerToken(): string | null {
   try {
-    return localStorage.getItem(CLAVE_TOKEN);
+    return localStorage.getItem(CLAVE_TOKEN) ?? sessionStorage.getItem(CLAVE_TOKEN);
   } catch {
     return null;
   }
 }
 
-function guardarToken(token: string | null) {
+function guardarToken(token: string | null, recordar = true) {
   try {
-    if (token) localStorage.setItem(CLAVE_TOKEN, token);
-    else localStorage.removeItem(CLAVE_TOKEN);
+    localStorage.removeItem(CLAVE_TOKEN);
+    sessionStorage.removeItem(CLAVE_TOKEN);
+    if (token) (recordar ? localStorage : sessionStorage).setItem(CLAVE_TOKEN, token);
   } catch {
     /* sin almacenamiento: la sesión dura lo que la pestaña */
   }
@@ -69,8 +72,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setCargando(false));
   }, [cerrarSesion, ciclo]);
 
-  const abrir = useCallback(({ token, usuario }: Sesion) => {
-    guardarToken(token);
+  const abrir = useCallback(({ token, usuario }: Sesion, recordar = true) => {
+    guardarToken(token, recordar);
     configurarSesion(token);
     setUsuario(usuario);
   }, []);
@@ -81,8 +84,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       cargando,
       errorConexion,
       reintentarConexion: () => setCiclo((c) => c + 1),
-      iniciarSesion: async (email, password) => abrir(await api.login(email, password)),
-      registrarse: async (nombre, email, password) => abrir(await api.registro(nombre, email, password)),
+      iniciarSesion: async (email, password, recordar) => abrir(await api.login(email, password), recordar),
+      registrarse: async (nombre, email, password, recordar) =>
+        abrir(await api.registro(nombre, email, password), recordar),
       cerrarSesion,
     }),
     [usuario, cargando, errorConexion, abrir, cerrarSesion],

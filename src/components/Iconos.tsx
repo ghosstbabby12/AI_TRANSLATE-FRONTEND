@@ -179,3 +179,44 @@ export const IconoPlay = () => (
     <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
   </Icono>
 );
+
+export const IconoUsuario = () => (
+  <Icono>
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 21a8 8 0 0 1 16 0" />
+  </Icono>
+);
+
+export const IconoCorreo = () => (
+  <Icono>
+    <rect x="3" y="5" width="18" height="14" rx="3" />
+    <path d="m4 7 8 6 8-6" />
+  </Icono>
+);
+
+export const IconoCandado = () => (
+  <Icono>
+    <rect x="4.5" y="10" width="15" height="11" rx="3" />
+    <path d="M8 10V7a4 4 0 0 1 8 0v3M12 14.5v2.5" />
+  </Icono>
+);
+
+export const IconoOjo = () => (
+  <Icono>
+    <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
+    <circle cx="12" cy="12" r="3" />
+  </Icono>
+);
+
+export const IconoOjoTachado = () => (
+  <Icono>
+    <path d="M10.6 5.1A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-2.8 3.7M6.6 6.6C3.7 8.5 2 12 2 12s3.6 7 10 7a9.9 9.9 0 0 0 5.4-1.6" />
+    <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2M3 3l18 18" />
+  </Icono>
+);
+
+export const IconoFlecha = () => (
+  <Icono>
+    <path d="M5 12h14M13 6l6 6-6 6" />
+  </Icono>
+);
