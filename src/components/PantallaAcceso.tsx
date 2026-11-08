@@ -1,8 +1,10 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "../auth";
+import { useT } from "../i18n";
 import { BotonTema } from "./BotonTema";
 import { IconoCandado, IconoCorreo, IconoFlecha, IconoOjo, IconoOjoTachado, IconoUsuario } from "./Iconos";
 import { LogoSimbolo } from "./Logo";
+import { SelectorIdioma } from "./SelectorIdioma";
 
 type Modo = "login" | "registro";
 
@@ -17,14 +19,15 @@ export function PantallaAcceso() {
   const [error, setError] = useState<string | null>(null);
   const [lento, setLento] = useState(false);
   const [recordar, setRecordar] = useState(true);
+  const t = useT();
 
   const esRegistro = modo === "registro";
 
   // Si el envío tarda, lo más probable es que la API esté despertando.
   useEffect(() => {
     if (!enviando) return setLento(false);
-    const t = setTimeout(() => setLento(true), 5_000);
-    return () => clearTimeout(t);
+    const temporizador = setTimeout(() => setLento(true), 5_000);
+    return () => clearTimeout(temporizador);
   }, [enviando]);
 
   async function enviar(e: FormEvent) {
@@ -48,6 +51,7 @@ export function PantallaAcceso() {
   return (
     <main className="acceso">
       <div className="acceso-tema">
+        <SelectorIdioma />
         <BotonTema />
       </div>
 
@@ -55,16 +59,16 @@ export function PantallaAcceso() {
         <div className="logo-baldosa">
           <LogoSimbolo tamano={88} />
         </div>
-        <h1 className="acceso-titulo">{esRegistro ? "Crea tu cuenta" : "Bienvenido de nuevo"}</h1>
-        <p className="acceso-subtitulo">{esRegistro ? "Empieza a traducir tus videos" : "Inicia sesión para continuar"}</p>
+        <h1 className="acceso-titulo">{esRegistro ? t("acceso.creaCuenta") : t("acceso.bienvenida")}</h1>
+        <p className="acceso-subtitulo">{esRegistro ? t("acceso.subtituloRegistro") : t("acceso.subtituloLogin")}</p>
 
         <form className="acceso-formulario" onSubmit={enviar}>
           {esRegistro && (
             <label className="campo-icono">
               <IconoUsuario />
               <input
-                aria-label="Nombre"
-                placeholder="Tu nombre"
+                aria-label={t("acceso.nombre")}
+                placeholder={t("acceso.nombre")}
                 autoComplete="name"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
@@ -78,8 +82,8 @@ export function PantallaAcceso() {
             <IconoCorreo />
             <input
               type="email"
-              aria-label="Email"
-              placeholder="Email"
+              aria-label={t("acceso.email")}
+              placeholder={t("acceso.email")}
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -91,8 +95,8 @@ export function PantallaAcceso() {
             <IconoCandado />
             <input
               type={verPassword ? "text" : "password"}
-              aria-label="Contraseña"
-              placeholder={esRegistro ? "Contraseña (mínimo 8 caracteres)" : "Contraseña"}
+              aria-label={t("acceso.contrasena")}
+              placeholder={esRegistro ? t("acceso.contrasenaRegistro") : t("acceso.contrasena")}
               autoComplete={esRegistro ? "new-password" : "current-password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -103,7 +107,7 @@ export function PantallaAcceso() {
               type="button"
               className="boton-ojo"
               onClick={() => setVerPassword((v) => !v)}
-              aria-label={verPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              aria-label={verPassword ? t("acceso.ocultarContrasena") : t("acceso.mostrarContrasena")}
             >
               {verPassword ? <IconoOjoTachado /> : <IconoOjo />}
             </button>
@@ -111,16 +115,16 @@ export function PantallaAcceso() {
 
           <label className="recordarme">
             <input type="checkbox" checked={recordar} onChange={(e) => setRecordar(e.target.checked)} />
-            <span>Recordarme en este equipo</span>
+            <span>{t("acceso.recordarme")}</span>
           </label>
 
           {error && <p className="error">{error}</p>}
           {lento && (
-            <p className="aviso-suave">El servidor está despertando; la primera vez puede tardar hasta un minuto.</p>
+            <p className="aviso-suave">{t("acceso.despertando")}</p>
           )}
 
           <button type="submit" className="primario boton-acceso" disabled={enviando}>
-            <span>{enviando ? "Un momento…" : esRegistro ? "Crear cuenta" : "Entrar"}</span>
+            <span>{enviando ? t("acceso.unMomento") : esRegistro ? t("acceso.crearCuenta") : t("acceso.entrar")}</span>
             <span className="boton-acceso-flecha" aria-hidden>
               <IconoFlecha />
             </span>
@@ -128,13 +132,13 @@ export function PantallaAcceso() {
         </form>
 
         <p className="acceso-cambiar">
-          {esRegistro ? "¿Ya tienes cuenta?" : "¿No tienes cuenta?"}{" "}
+          {esRegistro ? t("acceso.yaTienesCuenta") : t("acceso.noTienesCuenta")}{" "}
           <button type="button" className="boton-texto" onClick={() => cambiarModo(esRegistro ? "login" : "registro")}>
-            {esRegistro ? "Inicia sesión" : "Regístrate"}
+            {esRegistro ? t("acceso.iniciaSesion") : t("acceso.registrate")}
           </button>
         </p>
 
-        <p className="acceso-lema">Transcribe · Traduce · Comparte</p>
+        <p className="acceso-lema">{t("acceso.lema")}</p>
       </div>
     </main>
   );

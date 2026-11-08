@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 
-// Rutas por hash (#/, #/historial, #/video/<id>): funciona en cualquier hosting
+// Rutas por hash (#/, #/historial, #/perfil, #/video/<id>): funciona en cualquier hosting
 // estático sin configurar reescrituras.
-export type Ruta = { vista: "nuevo" } | { vista: "historial" } | { vista: "video"; id: string };
+export type Ruta = { vista: "nuevo" } | { vista: "historial" } | { vista: "perfil" } | { vista: "video"; id: string };
 
 function leerRuta(): Ruta {
   const partes = location.hash.replace(/^#\/?/, "").split("/");
   if (partes[0] === "historial") return { vista: "historial" };
+  if (partes[0] === "perfil") return { vista: "perfil" };
   if (partes[0] === "video" && partes[1]) return { vista: "video", id: partes[1] };
   return { vista: "nuevo" };
 }

@@ -6,12 +6,16 @@ import { Logo } from "./components/Logo";
 import { MenuUsuario } from "./components/MenuUsuario";
 import { PantallaAcceso } from "./components/PantallaAcceso";
 import { PantallaEspera, PantallaSinConexion } from "./components/PantallaEspera";
+import { PaginaPerfil } from "./components/PaginaPerfil";
 import { VistaVideo } from "./components/VistaVideo";
 import { navegar, useRuta } from "./hooks/useRuta";
+import { useT } from "./i18n";
 
 export function App() {
   const { usuario, cargando, errorConexion, reintentarConexion, cerrarSesion } = useAuth();
   const ruta = useRuta();
+  // Con useT, App se vuelve a pintar (con todos sus hijos) al cambiar de idioma
+  const t = useT();
 
   if (cargando) return <PantallaEspera />;
   if (!usuario && errorConexion) {
@@ -24,18 +28,18 @@ export function App() {
       <header className="cabecera-flotante">
         <a href="#/" className="marca pildora">
           <Logo />
-          <span className="marca-texto">Traductor de Video</span>
+          <span className="marca-texto">{t("app.marca")}</span>
         </a>
 
         {/* Dock de navegación: el destino activo queda "levantado" en una burbuja */}
-        <nav className="dock" aria-label="Principal">
-          <a href="#/" className={ruta.vista === "nuevo" ? "activo" : ""} data-tip="Traducir video">
+        <nav className="dock" aria-label={t("nav.principal")}>
+          <a href="#/" className={ruta.vista === "nuevo" ? "activo" : ""} data-tip={t("nav.traducirVideo")}>
             <IconoTraducir />
-            <span className="dock-etiqueta">Traducir</span>
+            <span className="dock-etiqueta">{t("nav.traducir")}</span>
           </a>
-          <a href="#/historial" className={ruta.vista === "historial" ? "activo" : ""} data-tip="Historial">
+          <a href="#/historial" className={ruta.vista === "historial" ? "activo" : ""} data-tip={t("nav.historial")}>
             <IconoHistorial />
-            <span className="dock-etiqueta">Historial</span>
+            <span className="dock-etiqueta">{t("nav.historial")}</span>
           </a>
         </nav>
 
@@ -45,14 +49,15 @@ export function App() {
       <main>
         {ruta.vista === "nuevo" && <FormularioNuevo />}
         {ruta.vista === "historial" && <Historial />}
+        {ruta.vista === "perfil" && <PaginaPerfil />}
         {/* key: al cambiar de video se reinicia todo el estado de la vista */}
         {ruta.vista === "video" && <VistaVideo key={ruta.id} id={ruta.id} />}
       </main>
 
       {ruta.vista !== "nuevo" && (
-        <button type="button" className="fab" onClick={() => navegar("/")} aria-label="Traducir un video nuevo">
+        <button type="button" className="fab" onClick={() => navegar("/")} aria-label={t("nav.nuevoVideoAria")}>
           <IconoMas />
-          <span>Nuevo video</span>
+          <span>{t("nav.nuevoVideo")}</span>
         </button>
       )}
     </>

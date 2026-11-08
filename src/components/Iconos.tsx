@@ -220,3 +220,23 @@ export const IconoFlecha = () => (
     <path d="M5 12h14M13 6l6 6-6 6" />
   </Icono>
 );
+
+export const IconoTelefono = () => (
+  <Icono>
+    <path d="M5 4h3.5l1.8 4.4-2.3 1.4a11 11 0 0 0 6.2 6.2l1.4-2.3L20 15.5V19a1.5 1.5 0 0 1-1.6 1.5A16.5 16.5 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4Z" />
+  </Icono>
+);
+
+export const IconoCamara = () => (
+  <Icono>
+    <path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.5-2h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5Z" />
+    <circle cx="12" cy="13" r="3.5" />
+  </Icono>
+);
+
+export const IconoEscudo = () => (
+  <Icono>
+    <path d="M12 3 5 6v5c0 4.4 3 8.3 7 9.5 4-1.2 7-5.1 7-9.5V6Z" />
+    <path d="m9 12 2 2 4-4" />
+  </Icono>
+);

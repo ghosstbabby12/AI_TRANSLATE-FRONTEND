@@ -1017,3 +1017,62 @@ button.peligro:hover:not(:disabled) { background: color-mix(in srgb, var(--error
 .dialogo .sutil { margin: 0; overflow-wrap: anywhere; }
 .dialogo-icono { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: color-mix(in srgb, var(--error) 12%, transparent); color: var(--error); }
 .dialogo-botones { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem; }
+
+/* =========================================================
+   Perfil
+   ========================================================= */
+.exito { color: var(--listo, #16a34a); font-size: 0.9rem; margin: 0; }
+.perfil-vista { max-width: 1000px; margin: 0 auto; }
+.perfil-rejilla { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+.perfil-columna { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
+.perfil-tarjeta h2 { margin: 0; font-size: 1.05rem; }
+.perfil-tarjeta-cabecera { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+
+.perfil-identidad { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.3rem; position: sticky; top: 6rem; }
+.perfil-identidad h2 { margin-top: 0.85rem; font-size: 1.25rem; overflow-wrap: anywhere; }
+.perfil-identidad .sutil { margin: 0; overflow-wrap: anywhere; }
+.perfil-miembro { margin: 0.35rem 0 0; font-size: 0.8rem; color: var(--texto-tenue); }
+.perfil-foto { position: relative; }
+.avatar-foto { object-fit: cover; display: block; padding: 0; background: var(--superficie-2); }
+.avatar-grande { width: 128px; height: 128px; font-size: 3rem; box-shadow: var(--sombra), 0 0 0 5px var(--superficie); }
+.perfil-foto-boton {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 999px;
+  border: 3px solid var(--superficie);
+  background: var(--brillo-boton);
+  color: #fff;
+  box-shadow: var(--sombra-pequena);
+}
+.perfil-foto-boton svg { width: 18px; height: 18px; }
+.perfil-foto-acciones { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; margin-top: 1.1rem; }
+.perfil-ayuda { font-size: 0.8rem; margin-top: 0.6rem !important; }
+
+.perfil-formulario { display: flex; flex-direction: column; gap: 1rem; }
+.campo-perfil > span:first-child { color: var(--texto); }
+.etiqueta-opcional { font-weight: 500; color: var(--texto-tenue); }
+.campo-icono-compacto > svg { width: 19px; height: 19px; left: 1rem; }
+.campo-icono-compacto input, .campo-icono-compacto select { width: 100%; height: 50px; padding-left: 2.9rem; border-radius: 14px; font-size: 0.95rem; }
+.campo-icono-compacto input[type="password"], .campo-icono-compacto input[type="text"]:has(+ .boton-ojo) { padding-right: 3.2rem; }
+.campo-icono-compacto .boton-ojo { width: 36px; height: 36px; }
+.perfil-acciones { display: flex; justify-content: flex-end; }
+
+/* Botón del menú con la foto de perfil */
+.boton-mas.con-foto { padding: 3px; overflow: hidden; }
+.boton-mas.con-foto .avatar { width: 100%; height: 100%; border-radius: 11px; }
+
+/* Selector de idioma (reutiliza el control segmentado del tema) */
+.codigo-idioma { font-weight: 800; letter-spacing: 0.04em; font-size: 0.78rem; }
+.selector-idioma.con-etiquetas .codigo-idioma { display: none; }
+.acceso-tema { display: flex; align-items: center; gap: 0.75rem; }
+.acceso-tema .selector-idioma { box-shadow: var(--hundido); }
+.acceso-tema .selector-idioma button { height: 36px; min-width: 42px; }
+
+@media (max-width: 760px) {
+  .perfil-rejilla { grid-template-columns: minmax(0, 1fr); }
+  .perfil-identidad { position: static; }
+}
