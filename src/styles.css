@@ -823,11 +823,62 @@ a.boton-icono { display: inline-flex; align-items: center; justify-content: cent
 }
 
 /* =========================================================
-   Otros idiomas
+   Otros idiomas (encabezado del panel de traducción)
    ========================================================= */
-.otras-traducciones { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; margin-left: 0.5rem; font-size: 0.82rem; }
+.otros-idiomas { display: flex; flex-direction: column; gap: 0.6rem; padding: 0.25rem 0.25rem 0.9rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--borde); }
+.boton-traducir-otro {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  border: 1px dashed var(--zona-borde);
+  background: var(--zona);
+  color: var(--enlace);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.boton-traducir-otro:hover:not(:disabled), .boton-traducir-otro[aria-expanded="true"] { border-style: solid; border-color: var(--acento); background: var(--acento-suave); }
+.boton-traducir-otro svg { width: 18px; height: 18px; }
+.panel-traducir { display: flex; flex-direction: column; gap: 0.5rem; animation: aparecer 0.16s ease-out; }
+.panel-traducir .sutil { margin: 0; font-size: 0.82rem; }
+.panel-traducir-botones { display: flex; gap: 0.5rem; justify-content: flex-end; }
+.otras-traducciones { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; font-size: 0.82rem; color: var(--texto-sutil); }
 .chip-enlace { text-decoration: none; border: 1px solid var(--borde); background: var(--superficie); color: var(--texto); }
 .chip-enlace:hover { border-color: var(--acento); color: var(--enlace); }
-.menu-idiomas { position: relative; display: inline-flex; }
-.popover-izq { left: 0; right: auto; transform-origin: top left; width: min(320px, calc(100vw - 2rem)); }
-.popover-izq::before { left: 22px; right: auto; }
+
+/* =========================================================
+   Editar y eliminar
+   ========================================================= */
+.vista-titulo { flex: 1; min-width: 0; }
+.cabecera-acciones { display: flex; align-items: center; gap: 0.25rem; flex-shrink: 0; }
+.cabecera-acciones .badge { margin-right: 0.35rem; }
+.boton-peligro:hover:not(:disabled) { background: color-mix(in srgb, var(--error) 12%, transparent); color: var(--error); }
+.espaciador { flex: 1; }
+.tarjeta-video-pie .boton-icono { width: 34px; height: 34px; color: var(--texto-sutil); }
+
+.editar-nombre { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 640px; }
+.editar-nombre input { height: 44px; font-size: 1rem; font-weight: 600; }
+.vista-titulo .editar-nombre input { font-size: 1.2rem; }
+.editar-nombre-botones { display: flex; gap: 0.5rem; justify-content: flex-end; }
+.editar-nombre-botones button { padding: 0.5rem 0.95rem; }
+.editar-nombre .error { margin: 0; font-size: 0.86rem; }
+
+button.peligro { background: var(--error); color: #fff; border-color: transparent; font-weight: 600; }
+button.peligro:hover:not(:disabled) { background: color-mix(in srgb, var(--error) 85%, black); }
+
+.fondo-dialogo {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(8 12 24 / 0.5);
+  backdrop-filter: blur(3px);
+  animation: aparecer 0.15s ease-out;
+}
+.dialogo { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 0.6rem; padding: 1.5rem; box-shadow: var(--sombra-flotante); }
+.dialogo h2 { margin: 0.25rem 0 0; font-size: 1.15rem; }
+.dialogo .sutil { margin: 0; overflow-wrap: anywhere; }
+.dialogo-icono { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: color-mix(in srgb, var(--error) 12%, transparent); color: var(--error); }
+.dialogo-botones { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem; }

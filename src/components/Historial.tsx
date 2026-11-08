@@ -2,14 +2,18 @@ import { useEffect, useState } from "react";
 import { api, type FormatoSubtitulos, type VideoHistorial } from "../api";
 import { navegar } from "../hooks/useRuta";
 import { tituloVideo } from "../nombres";
+import { ConfirmarEliminar } from "./ConfirmarEliminar";
+import { EditarNombre } from "./EditarNombre";
 import { EstadoBadge } from "./EstadoBadge";
-import { IconoAbrir, IconoDescargar, IconoVideo } from "./Iconos";
+import { IconoAbrir, IconoDescargar, IconoEditar, IconoEliminar, IconoVideo } from "./Iconos";
 
 const fecha = new Intl.DateTimeFormat("es", { dateStyle: "medium", timeStyle: "short" });
 
 export function Historial() {
   const [videos, setVideos] = useState<VideoHistorial[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [editandoId, setEditandoId] = useState<string | null>(null);
+  const [aEliminar, setAEliminar] = useState<VideoHistorial | null>(null);
 
   // Se refresca solo mientras haya algún video en proceso.
   useEffect(() => {
@@ -34,6 +38,19 @@ export function Historial() {
       clearTimeout(temporizador);
     };
   }, []);
+
+  async function renombrar(id: string, nombre: string) {
+    await api.renombrarVideo(id, nombre);
+    // El nombre cambia también en las otras traducciones del mismo video
+    setVideos(await api.listarVideos());
+    setEditandoId(null);
+  }
+
+  async function eliminar(video: VideoHistorial) {
+    await api.eliminarVideo(video.id);
+    setVideos((lista) => lista?.filter((v) => v.id !== video.id) ?? null);
+    setAEliminar(null);
+  }
 
   const descargar = (id: string, formato: FormatoSubtitulos) =>
     api.descargarSubtitulos(id, formato).catch((e) => setError(e.message));
@@ -87,7 +104,36 @@ export function Historial() {
                 </button>
 
                 <div className="tarjeta-video-pie">
-                  <EstadoBadge estado={v.estado} />
+                  {editandoId === v.id ? (
+                    <EditarNombre
+                      nombreActual={tituloVideo(v)}
+                      onGuardar={(nombre) => renombrar(v.id, nombre)}
+                      onCancelar={() => setEditandoId(null)}
+                    />
+                  ) : (
+                    <>
+                      <EstadoBadge estado={v.estado} />
+                      <span className="espaciador" />
+                      <button
+                        type="button"
+                        className="boton-icono"
+                        data-tip="Editar nombre"
+                        aria-label={`Editar el nombre de ${tituloVideo(v)}`}
+                        onClick={() => setEditandoId(v.id)}
+                      >
+                        <IconoEditar />
+                      </button>
+                      <button
+                        type="button"
+                        className="boton-icono boton-peligro"
+                        data-tip="Eliminar"
+                        aria-label={`Eliminar ${tituloVideo(v)}`}
+                        onClick={() => setAEliminar(v)}
+                      >
+                        <IconoEliminar />
+                      </button>
+                    </>
+                  )}
                 </div>
 
                 {/* Acciones flotantes sobre la miniatura */}
@@ -120,6 +166,15 @@ export function Historial() {
             );
           })}
         </ul>
+      )}
+
+      {aEliminar && (
+        <ConfirmarEliminar
+          nombre={tituloVideo(aEliminar)}
+          idioma={aEliminar.idioma_destino}
+          onConfirmar={() => eliminar(aEliminar)}
+          onCancelar={() => setAEliminar(null)}
+        />
       )}
     </section>
   );
