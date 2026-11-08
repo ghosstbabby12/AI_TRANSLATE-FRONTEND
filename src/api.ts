@@ -112,18 +112,58 @@ export class ErrorApi extends Error {
   }
 }
 
+// El plan gratuito de Render duerme la API tras 15 min sin uso y tarda ~50 s
+// en despertar: el límite lo cubre, pero ninguna petición espera para siempre.
+const TIEMPO_LIMITE_MS = 75_000;
+export const MENSAJE_SIN_RESPUESTA =
+  "El servidor no respondió a tiempo. Si estaba inactivo puede tardar hasta un minuto en despertar; intenta de nuevo.";
+export const MENSAJE_SIN_CONEXION =
+  "No se pudo conectar con el servidor. Revisa tu conexión o intenta de nuevo en un momento.";
+
+const esperar = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Combina la cancelación de quien llama (si hay) con el tiempo límite. */
+function senalConLimite(externa?: AbortSignal | null): AbortSignal {
+  const limite = AbortSignal.timeout(TIEMPO_LIMITE_MS);
+  if (!externa) return limite;
+  return "any" in AbortSignal ? AbortSignal.any([externa, limite]) : externa;
+}
+
 async function pedir(ruta: string, init: RequestInit = {}): Promise<Response> {
-  const res = await fetch(`${BASE}${ruta}`, {
-    ...init,
-    headers: { ...cabeceraAuth(), ...init.headers },
-  });
-  // Token vencido o inválido: se cierra la sesión (salvo en el propio login)
-  if (res.status === 401 && token) alExpirar();
-  if (!res.ok) {
-    const cuerpo = await res.json().catch(() => null);
-    throw new ErrorApi(cuerpo?.error ?? `Error ${res.status}`, res.status);
+  // Las consultas (GET) se reintentan solas ante fallos transitorios de red o
+  // del proxy de Render; las escrituras no, para no repetir una acción.
+  const reintentable = (init.method ?? "GET").toUpperCase() === "GET";
+
+  for (let intento = 0; ; intento++) {
+    let res: Response;
+    try {
+      res = await fetch(`${BASE}${ruta}`, {
+        ...init,
+        headers: { ...cabeceraAuth(), ...init.headers },
+        signal: senalConLimite(init.signal),
+      });
+    } catch (err) {
+      if (init.signal?.aborted) throw err; // lo canceló quien llamó (p. ej. al cambiar de vista)
+      const porTiempo = err instanceof DOMException && err.name === "TimeoutError";
+      if (!porTiempo && reintentable && intento < 2) {
+        await esperar(2_000 * (intento + 1));
+        continue;
+      }
+      throw new ErrorApi(porTiempo ? MENSAJE_SIN_RESPUESTA : MENSAJE_SIN_CONEXION, 0);
+    }
+
+    if (reintentable && intento < 2 && [502, 503, 504].includes(res.status)) {
+      await esperar(2_000 * (intento + 1));
+      continue;
+    }
+    // Token vencido o inválido: se cierra la sesión (salvo en el propio login)
+    if (res.status === 401 && token) alExpirar();
+    if (!res.ok) {
+      const cuerpo = await res.json().catch(() => null);
+      throw new ErrorApi(cuerpo?.error ?? `Error ${res.status}`, res.status);
+    }
+    return res;
   }
-  return res;
 }
 
 const json = async <T,>(ruta: string, init?: RequestInit) => (await pedir(ruta, init)).json() as Promise<T>;
@@ -184,7 +224,7 @@ export const api = {
         if (xhr.status >= 200 && xhr.status < 300) resolve(cuerpo as Video);
         else reject(new ErrorApi((cuerpo as { error?: string })?.error ?? `Error ${xhr.status}`, xhr.status));
       };
-      xhr.onerror = () => reject(new ErrorApi("No se pudo conectar con el servidor", 0));
+      xhr.onerror = () => reject(new ErrorApi(MENSAJE_SIN_CONEXION, 0));
       xhr.send(form);
     }),
 
