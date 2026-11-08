@@ -29,6 +29,8 @@ export interface Video {
 
 export interface VideoHistorial extends Video {
   segmentos_listos: number;
+  /** Fotograma del video (URL temporal); null si aún no se generó. */
+  url_miniatura: string | null;
 }
 
 export interface TraduccionResumen {
@@ -39,6 +41,7 @@ export interface TraduccionResumen {
 
 export interface VideoDetalle extends Video {
   url_reproduccion: string | null;
+  url_miniatura: string | null;
   /** Todas las traducciones del mismo archivo (incluida esta). */
   traducciones: TraduccionResumen[];
   /** Video con subtítulos incrustados (se genera bajo demanda). */

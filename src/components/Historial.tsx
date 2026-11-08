@@ -5,7 +5,8 @@ import { tituloVideo } from "../nombres";
 import { ConfirmarEliminar } from "./ConfirmarEliminar";
 import { EditarNombre } from "./EditarNombre";
 import { EstadoBadge } from "./EstadoBadge";
-import { IconoAbrir, IconoDescargar, IconoEditar, IconoEliminar, IconoVideo } from "./Iconos";
+import { formatoTiempo } from "../vtt";
+import { IconoAbrir, IconoDescargar, IconoEditar, IconoEliminar, IconoPlay, IconoVideo } from "./Iconos";
 
 const fecha = new Intl.DateTimeFormat("es", { dateStyle: "medium", timeStyle: "short" });
 
@@ -89,7 +90,20 @@ export function Historial() {
                 <button type="button" className="tarjeta-video-cuerpo" onClick={() => navegar(`/video/${v.id}`)}>
                   <span className="miniatura" aria-hidden>
                     <IconoVideo />
+                    {v.url_miniatura && (
+                      <img
+                        src={v.url_miniatura}
+                        alt=""
+                        loading="lazy"
+                        // Si la URL caducó o falla, queda el degradado de fondo
+                        onError={(e) => (e.currentTarget.style.display = "none")}
+                      />
+                    )}
+                    <span className="miniatura-play">
+                      <IconoPlay />
+                    </span>
                     <span className="chip chip-acento">{v.idioma_destino.toUpperCase()}</span>
+                    {v.duracion_seg != null && <span className="miniatura-duracion">{formatoTiempo(v.duracion_seg)}</span>}
                   </span>
                   <strong title={tituloVideo(v)}>{tituloVideo(v)}</strong>
                   <span className="sutil">
