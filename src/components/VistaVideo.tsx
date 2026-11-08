@@ -7,6 +7,7 @@ import { DescargaVideo } from "./DescargaVideo";
 import { EstadoBadge } from "./EstadoBadge";
 import { IconoDescargar, IconoReintentar } from "./Iconos";
 import { tituloVideo } from "../nombres";
+import { OtrosIdiomas } from "./OtrosIdiomas";
 import { ReproductorSubtitulado } from "./ReproductorSubtitulado";
 import { VerUrl } from "./VerUrl";
 
@@ -93,6 +94,12 @@ export function VistaVideo({ id }: { id: string }) {
             )}
             <span className="chip chip-acento">{estado.idioma_destino.toUpperCase()}</span>
             {detalle.origen_url && <VerUrl url={detalle.origen_url} />}
+            <OtrosIdiomas
+              id={id}
+              idiomaActual={estado.idioma_destino}
+              traducciones={detalle.traducciones ?? []}
+              disponible={estado.progreso.total > 0}
+            />
           </div>
         </div>
         <EstadoBadge estado={estado.estado} />
