@@ -159,3 +159,17 @@ export const IconoGlobo = () => (
     <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
   </Icono>
 );
+
+export const IconoEditar = () => (
+  <Icono>
+    <path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-4-4L4 16z" />
+    <path d="m13.5 6.5 4 4" />
+  </Icono>
+);
+
+export const IconoEliminar = () => (
+  <Icono>
+    <path d="M4 7h16M10 11v6M14 11v6" />
+    <path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
+  </Icono>
+);

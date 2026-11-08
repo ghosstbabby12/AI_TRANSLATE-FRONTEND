@@ -203,6 +203,17 @@ export const api = {
   estado: (id: string, signal?: AbortSignal) => json<EstadoRespuesta>(`/videos/${id}/estado`, { signal }),
   subtitulosVtt: async (id: string, signal?: AbortSignal) =>
     (await pedir(`/videos/${id}/subtitulos?formato=vtt`, { signal })).text(),
+  /** Cambia el nombre (se aplica también a las demás traducciones del mismo video). */
+  renombrarVideo: (id: string, nombre: string) =>
+    json<{ nombre: string; actualizados: number }>(`/videos/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombre }),
+    }),
+  /** Elimina esta traducción del video (responde 204, sin cuerpo). */
+  eliminarVideo: async (id: string) => {
+    await pedir(`/videos/${id}`, { method: "DELETE" });
+  },
   /** Traduce los subtítulos ya generados a otro idioma (reutiliza la transcripción). */
   traducirA: (id: string, idiomaDestino: string) =>
     json<{ id: string; existente: boolean }>(`/videos/${id}/traducir`, {
