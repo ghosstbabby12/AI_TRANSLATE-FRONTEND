@@ -56,7 +56,7 @@ export function VistaVideo({ id }: { id: string }) {
           key={f}
           type="button"
           className="boton-icono con-texto"
-          data-tip={f === "txt" ? "Descargar transcripción .txt" : `Descargar subtítulos .${f}`}
+          data-tip={f === "txt" ? "Transcripción en texto (.txt)" : `Solo subtítulos, archivo de texto (.${f})`}
           aria-label={f === "txt" ? "Descargar transcripción .txt" : `Descargar subtítulos .${f}`}
           disabled={sinSubtitulos}
           onClick={() => descargar(f)}
@@ -112,14 +112,14 @@ export function VistaVideo({ id }: { id: string }) {
             acciones={acciones}
             terminado={estado.estado === "completo" || estado.estado === "error"}
           />
-          <div className="tarjeta tarjeta-progreso">
-            <BarraProgreso estado={estado} tiempoActual={tiempo} onBuscar={buscar} />
-          </div>
           {detalle.url_reproduccion && (
             <div className="tarjeta tarjeta-descarga">
               <DescargaVideo id={id} estadoInicial={detalle.export_estado} deshabilitado={sinSubtitulos} />
             </div>
           )}
+          <div className="tarjeta tarjeta-progreso">
+            <BarraProgreso estado={estado} tiempoActual={tiempo} onBuscar={buscar} />
+          </div>
           {accion && <p className="sutil">{accion}</p>}
         </div>
 
