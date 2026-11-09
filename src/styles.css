@@ -1076,3 +1076,41 @@ button.peligro:hover:not(:disabled) { background: color-mix(in srgb, var(--error
   .perfil-rejilla { grid-template-columns: minmax(0, 1fr); }
   .perfil-identidad { position: static; }
 }
+
+/* =========================================================
+   Resumen con IA
+   ========================================================= */
+.tarjeta-resumen { margin-top: 1rem; padding: 1.1rem 1.25rem; }
+.resumen-cabecera { display: flex; align-items: center; gap: 0.85rem; }
+.resumen-cabecera-texto { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; flex: 1; }
+.resumen-cabecera-texto .sutil { margin: 0; font-size: 0.86rem; }
+.resumen-acciones { display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; }
+.resumen-acciones .primario, .resumen-acciones .secundario { border-radius: 999px; padding: 0.65rem 1.2rem; }
+.tarjeta-resumen > .resumen > .error { margin: 0.75rem 0 0; font-size: 0.9rem; }
+
+.resumen-cuerpo { margin-top: 1rem; padding: 1.1rem 1.25rem; border-radius: var(--radio); background: var(--superficie-2); box-shadow: var(--hundido); transition: opacity 0.2s ease; }
+.resumen-cuerpo.regenerando { opacity: 0.55; }
+.resumen-contenido { line-height: 1.6; }
+.resumen-contenido h3 { margin: 1.1rem 0 0.4rem; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--enlace); }
+.resumen-contenido h3:first-child { margin-top: 0; }
+.resumen-contenido p { margin: 0 0 0.5rem; }
+.resumen-contenido ul { margin: 0 0 0.5rem; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.3rem; }
+.resumen-contenido li.momento { list-style: none; margin-left: -1.2rem; display: flex; align-items: baseline; gap: 0.6rem; }
+.marca-tiempo {
+  flex-shrink: 0;
+  padding: 0.1rem 0.5rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--acento-suave);
+  color: var(--enlace);
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.marca-tiempo:hover { background: var(--acento); color: #fff; }
+.resumen-fecha { margin: 0.9rem 0 0; font-size: 0.78rem; color: var(--texto-tenue); }
+
+@media (max-width: 620px) {
+  .resumen-cabecera { flex-wrap: wrap; }
+  .resumen-acciones { width: 100%; justify-content: flex-end; }
+}

@@ -151,6 +151,22 @@ export const es = {
   "descarga.descargar": "Descargar video",
   "descarga.error": "No se pudo generar el video.",
 
+  // Resumen con IA
+  "resumen.titulo": "Resumen con IA",
+  "resumen.detalle": "Las ideas principales y los momentos clave del video, en {idioma}.",
+  "resumen.esperando": "Disponible cuando termine la traducción.",
+  "resumen.generar": "Generar resumen",
+  "resumen.generando": "Generando resumen…",
+  "resumen.generandoDetalle": "Suele tardar menos de un minuto. Puedes seguir usando la app.",
+  "resumen.regenerar": "Regenerar",
+  "resumen.descargar": "Descargar .txt",
+  "resumen.copiar": "Copiar",
+  "resumen.copiado": "¡Copiado!",
+  "resumen.error": "No se pudo generar el resumen. Intenta de nuevo.",
+  "resumen.reintentar": "Reintentar",
+  "resumen.generadoEl": "Generado el {fecha}",
+  "resumen.ir": "Ir a {tiempo}",
+
   // Otros idiomas
   "otros.boton": "Traducir transcripción a otro idioma",
   "otros.noDisponible": "Disponible cuando el video termine de prepararse",

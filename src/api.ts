@@ -49,6 +49,12 @@ export interface VideoDetalle extends Video {
   export_estado: EstadoExportacion | null;
   export_error: string | null;
   url_exportacion: string | null;
+  /** Resumen con IA (se genera bajo demanda, en el idioma de la traducción). */
+  resumen_estado: EstadoExportacion | null;
+  /** Formato: "## Título" para secciones y "- " para viñetas. */
+  resumen_texto: string | null;
+  resumen_error: string | null;
+  resumen_en: string | null;
 }
 
 export interface SegmentoEstado {
@@ -273,6 +279,10 @@ export const api = {
     }),
   /** Pide generar el video con subtítulos incrustados (trabajo en segundo plano). */
   exportarVideo: (id: string) => json<{ export_estado: EstadoExportacion }>(`/videos/${id}/exportar`, { method: "POST" }),
+  /** Pide generar (o regenerar) el resumen con IA (trabajo en segundo plano). */
+  generarResumen: (id: string) =>
+    json<{ resumen_estado: EstadoExportacion }>(`/videos/${id}/resumen`, { method: "POST" }),
+  descargarResumen: (id: string) => descargar(`/videos/${id}/resumen?descargar=1`, "resumen.txt"),
   reintentar: (id: string) => json<{ reencolados: number; video?: boolean }>(`/videos/${id}/reintentar`, { method: "POST" }),
 
   crearDesdeUrl: (url: string, idiomaDestino: string) =>
@@ -312,13 +322,16 @@ export const api = {
     }),
 
   /** La descarga lleva la cabecera de usuario, así que no sirve un <a href> directo. */
-  descargarSubtitulos: async (id: string, formato: FormatoSubtitulos) => {
-    const res = await pedir(`/videos/${id}/subtitulos?formato=${formato}&descargar=1`);
-    const nombre =
-      /filename="?([^";]+)"?/.exec(res.headers.get("Content-Disposition") ?? "")?.[1] ?? `subtitulos.${formato}`;
-    const url = URL.createObjectURL(await res.blob());
-    const a = Object.assign(document.createElement("a"), { href: url, download: nombre });
-    a.click();
-    URL.revokeObjectURL(url);
-  },
+  descargarSubtitulos: (id: string, formato: FormatoSubtitulos) =>
+    descargar(`/videos/${id}/subtitulos?formato=${formato}&descargar=1`, `subtitulos.${formato}`),
 };
+
+/** Descarga un archivo de la API con el nombre que indica el servidor. */
+async function descargar(ruta: string, nombrePorDefecto: string) {
+  const res = await pedir(ruta);
+  const nombre = /filename="?([^";]+)"?/.exec(res.headers.get("Content-Disposition") ?? "")?.[1] ?? nombrePorDefecto;
+  const url = URL.createObjectURL(await res.blob());
+  const a = Object.assign(document.createElement("a"), { href: url, download: nombre });
+  a.click();
+  URL.revokeObjectURL(url);
+}
