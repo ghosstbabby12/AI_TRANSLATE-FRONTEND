@@ -36,10 +36,14 @@ export function traducirMensajeServidor(mensaje: string): string {
   return actual === "en" ? (erroresServidorEn[mensaje] ?? mensaje) : mensaje;
 }
 
-/** "en" → "Inglés" / "English", con los nombres que ya trae el navegador. */
-export function nombreIdioma(codigo: string): string {
+/**
+ * "en" → "Inglés" / "English", con los nombres que ya trae el navegador.
+ * `enFrase`: dentro de una oración ("en inglés"); en inglés siguen con mayúscula.
+ */
+export function nombreIdioma(codigo: string, { enFrase = false } = {}): string {
   try {
     const nombre = new Intl.DisplayNames([actual], { type: "language" }).of(codigo) ?? codigo;
+    if (enFrase && actual === "es") return nombre.toLowerCase();
     return nombre.charAt(0).toUpperCase() + nombre.slice(1);
   } catch {
     return codigo.toUpperCase();

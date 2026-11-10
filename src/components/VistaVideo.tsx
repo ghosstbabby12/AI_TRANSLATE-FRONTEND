@@ -14,6 +14,7 @@ import { tituloVideo } from "../nombres";
 import { OtrosIdiomas } from "./OtrosIdiomas";
 import { ReproductorSubtitulado } from "./ReproductorSubtitulado";
 import { ResumenVideo } from "./ResumenVideo";
+import { AudioTraduccion } from "./AudioTraduccion";
 import { VerUrl } from "./VerUrl";
 
 export function VistaVideo({ id }: { id: string }) {
@@ -181,6 +182,13 @@ export function VistaVideo({ id }: { id: string }) {
               <DescargaVideo id={id} estadoInicial={detalle.export_estado} deshabilitado={sinSubtitulos} />
             </div>
           )}
+          <div className="tarjeta tarjeta-resumen">
+            <AudioTraduccion
+              video={detalle}
+              disponible={(estado.estado === "completo" || estado.estado === "error") && !sinSubtitulos}
+              videoRef={videoRef}
+            />
+          </div>
           <div className="tarjeta tarjeta-resumen">
             <ResumenVideo
               video={detalle}

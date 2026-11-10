@@ -55,6 +55,14 @@ export interface VideoDetalle extends Video {
   resumen_texto: string | null;
   resumen_error: string | null;
   resumen_en: string | null;
+  /** Audio de la traducción con voz sintética (se genera bajo demanda). */
+  voz_disponible: boolean;
+  audio_estado: EstadoExportacion | null;
+  audio_error: string | null;
+  /** Para escucharlo (URL temporal). */
+  url_audio: string | null;
+  /** La misma, pero el navegador la descarga con nombre propio. */
+  url_audio_descarga: string | null;
 }
 
 export interface SegmentoEstado {
@@ -279,6 +287,8 @@ export const api = {
     }),
   /** Pide generar el video con subtítulos incrustados (trabajo en segundo plano). */
   exportarVideo: (id: string) => json<{ export_estado: EstadoExportacion }>(`/videos/${id}/exportar`, { method: "POST" }),
+  /** Pide generar el audio de la traducción (trabajo en segundo plano). */
+  generarAudio: (id: string) => json<{ audio_estado: EstadoExportacion }>(`/videos/${id}/audio`, { method: "POST" }),
   /** Pide generar (o regenerar) el resumen con IA (trabajo en segundo plano). */
   generarResumen: (id: string) =>
     json<{ resumen_estado: EstadoExportacion }>(`/videos/${id}/resumen`, { method: "POST" }),

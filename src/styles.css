@@ -1114,3 +1114,41 @@ button.peligro:hover:not(:disabled) { background: color-mix(in srgb, var(--error
   .resumen-cabecera { flex-wrap: wrap; }
   .resumen-acciones { width: 100%; justify-content: flex-end; }
 }
+
+/* =========================================================
+   Audio de la traducción
+   ========================================================= */
+.audio-traduccion > .error { margin: 0.75rem 0 0; font-size: 0.9rem; }
+.audio-cuerpo { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.9rem; }
+.audio-cuerpo audio { width: 100%; height: 44px; border-radius: 999px; }
+
+/* Interruptor (checkbox con aspecto de switch) */
+.interruptor { display: flex; align-items: center; gap: 0.85rem; cursor: pointer; user-select: none; }
+.interruptor input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.interruptor-pista {
+  position: relative;
+  flex-shrink: 0;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--superficie-2);
+  box-shadow: var(--hundido);
+  transition: background 0.2s ease;
+}
+.interruptor-pista::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--texto-tenue);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  transition: translate 0.2s ease, background 0.2s ease;
+}
+.interruptor input:checked + .interruptor-pista { background: var(--brillo-boton); }
+.interruptor input:checked + .interruptor-pista::after { translate: 20px 0; background: #fff; }
+.interruptor input:focus-visible + .interruptor-pista { outline: 2px solid var(--acento); outline-offset: 2px; }
+.interruptor > span:last-child { display: flex; flex-direction: column; gap: 0.1rem; }
+.interruptor .sutil { margin: 0; font-size: 0.84rem; }

@@ -130,7 +130,7 @@ export function ResumenVideo({ video, disponible, onBuscar }: Props) {
     ? t("resumen.generandoDetalle")
     : !disponible && !texto
       ? t("resumen.esperando")
-      : t("resumen.detalle", { idioma: nombreIdioma(video.idioma_destino) });
+      : t("resumen.detalle", { idioma: nombreIdioma(video.idioma_destino, { enFrase: true }) });
 
   return (
     <div className="resumen">

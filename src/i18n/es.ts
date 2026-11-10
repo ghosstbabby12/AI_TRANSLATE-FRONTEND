@@ -151,6 +151,21 @@ export const es = {
   "descarga.descargar": "Descargar video",
   "descarga.error": "No se pudo generar el video.",
 
+  // Audio de la traducción
+  "audio.titulo": "Audio de la traducción",
+  "audio.detalle": "La traducción narrada con voz sintética en {idioma}, al ritmo del video.",
+  "audio.noDisponible": "Todavía no hay voz sintética en {idioma}.",
+  "audio.esperando": "Disponible cuando termine la traducción.",
+  "audio.generar": "Generar audio",
+  "audio.generando": "Generando audio…",
+  "audio.generandoDetalle": "Puede tardar unos minutos. Puedes seguir usando la app.",
+  "audio.reintentar": "Reintentar",
+  "audio.error": "No se pudo generar el audio. Intenta de nuevo.",
+  "audio.descargar": "Descargar MP3",
+  "audio.sobreVideo": "Escuchar sobre el video",
+  "audio.sobreVideoDetalle": "Silencia el audio original y reproduce la traducción sincronizada con la imagen.",
+  "audio.reproductor": "Reproductor del audio de la traducción",
+
   // Resumen con IA
   "resumen.titulo": "Resumen con IA",
   "resumen.detalle": "Las ideas principales y los momentos clave del video, en {idioma}.",
