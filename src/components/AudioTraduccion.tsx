@@ -4,13 +4,18 @@ import { nombreIdioma, useT } from "../i18n";
 import { IconoAltavoz, IconoDescargar, IconoReintentar } from "./Iconos";
 
 interface Props {
-  video: Pick<VideoDetalle, "id" | "idioma_destino" | "voz_disponible" | "audio_estado" | "url_audio" | "url_audio_descarga">;
+  video: Pick<
+    VideoDetalle,
+    "id" | "idioma_destino" | "voz_disponible" | "audio_estado" | "audio_error" | "audio_progreso" | "url_audio" | "url_audio_descarga"
+  >;
   /** Solo se puede generar cuando la traducción terminó. */
   disponible: boolean;
   videoRef: RefObject<HTMLVideoElement | null>;
 }
 
-const INTERVALO_MS = 5_000;
+const INTERVALO_MS = 4_000;
+// Error del servidor cuando el proceso se cortó varias veces (falta de memoria): reintentar no sirve
+const ERROR_INTERRUMPIDO = "El servidor se quedó sin memoria o se reinició mientras generaba el audio.";
 // Desfase tolerado entre la imagen y la voz antes de corregirlo (segundos)
 const DESFASE_MAXIMO = 0.3;
 
@@ -63,6 +68,8 @@ export function AudioTraduccion({ video, disponible, videoRef }: Props) {
   const t = useT();
   const [estado, setEstado] = useState<EstadoExportacion | null>(video.audio_estado);
   const [urls, setUrls] = useState({ audio: video.url_audio, descarga: video.url_audio_descarga });
+  const [progreso, setProgreso] = useState(video.audio_progreso ?? 0);
+  const [errorServidor, setErrorServidor] = useState(video.audio_error);
   const [error, setError] = useState<string | null>(null);
   const [doblaje, setDoblaje] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -75,7 +82,9 @@ export function AudioTraduccion({ video, disponible, videoRef }: Props) {
     const temporizador = setInterval(async () => {
       try {
         const det = await api.obtenerVideo(video.id, control.signal);
+        setProgreso(det.audio_progreso ?? 0);
         if (det.audio_estado === "procesando") return;
+        setErrorServidor(det.audio_error);
         setEstado(det.audio_estado);
         setUrls({ audio: det.url_audio, descarga: det.url_audio_descarga });
       } catch {
@@ -92,6 +101,7 @@ export function AudioTraduccion({ video, disponible, videoRef }: Props) {
     setError(null);
     try {
       await api.generarAudio(video.id);
+      setProgreso(0);
       setEstado("procesando");
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -156,14 +166,16 @@ export function AudioTraduccion({ video, disponible, videoRef }: Props) {
                 ) : (
                   <IconoAltavoz />
                 )}
-                {generando ? t("audio.generando") : estado === "error" ? t("audio.reintentar") : t("audio.generar")}
+                {generando ? t("audio.generando", { progreso }) : estado === "error" ? t("audio.reintentar") : t("audio.generar")}
               </button>
             )
           )}
         </div>
       </div>
 
-      {estado === "error" && <p className="error">{t("audio.error")}</p>}
+      {estado === "error" && (
+        <p className="error">{t(errorServidor?.startsWith(ERROR_INTERRUMPIDO) ? "audio.errorMemoria" : "audio.error")}</p>
+      )}
       {error && <p className="error">{error}</p>}
 
       {listo && (

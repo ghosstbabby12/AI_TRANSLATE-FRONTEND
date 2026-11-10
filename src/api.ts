@@ -59,6 +59,8 @@ export interface VideoDetalle extends Video {
   voz_disponible: boolean;
   audio_estado: EstadoExportacion | null;
   audio_error: string | null;
+  /** Avance (0-100) mientras se genera el audio. */
+  audio_progreso: number | null;
   /** Para escucharlo (URL temporal). */
   url_audio: string | null;
   /** La misma, pero el navegador la descarga con nombre propio. */
