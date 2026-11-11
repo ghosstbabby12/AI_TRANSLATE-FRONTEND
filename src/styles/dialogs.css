@@ -1,0 +1,35 @@
+/* Rename and delete */
+
+.video-title { flex: 1; min-width: 0; }
+.header-actions { display: flex; align-items: center; gap: 0.25rem; flex-shrink: 0; }
+.header-actions .badge { margin-right: 0.35rem; }
+.danger-icon:hover:not(:disabled) { background: color-mix(in srgb, var(--error) 12%, transparent); color: var(--error); }
+.spacer { flex: 1; }
+.video-card-footer .icon-button { width: 34px; height: 34px; color: var(--text-muted); }
+
+.rename-form { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 640px; }
+.rename-form input { height: 44px; font-size: 1rem; font-weight: 600; }
+.video-title .rename-form input { font-size: 1.2rem; }
+.rename-form-buttons { display: flex; gap: 0.5rem; justify-content: flex-end; }
+.rename-form-buttons button { padding: 0.5rem 0.95rem; }
+.rename-form .error { margin: 0; font-size: 0.86rem; }
+
+button.danger { background: var(--error); color: #fff; border-color: transparent; font-weight: 600; }
+button.danger:hover:not(:disabled) { background: color-mix(in srgb, var(--error) 85%, black); }
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(8 12 24 / 0.5);
+  backdrop-filter: blur(3px);
+  animation: appear 0.15s ease-out;
+}
+.dialog { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 0.6rem; padding: 1.5rem; box-shadow: var(--shadow-floating); }
+.dialog h2 { margin: 0.25rem 0 0; font-size: 1.15rem; }
+.dialog .muted { margin: 0; overflow-wrap: anywhere; }
+.dialog-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: color-mix(in srgb, var(--error) 12%, transparent); color: var(--error); }
+.dialog-buttons { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem; }

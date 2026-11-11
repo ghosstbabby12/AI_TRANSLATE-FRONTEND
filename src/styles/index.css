@@ -1,0 +1,17 @@
+/* Global styles, imported in the original order so the cascade stays the same. */
+@import "./tokens.css";
+@import "./base.css";
+@import "./buttons.css";
+@import "./header.css";
+@import "./forms.css";
+@import "./home.css";
+@import "./progress.css";
+@import "./video.css";
+@import "./history.css";
+@import "./auth.css";
+@import "./responsive.css";
+@import "./other-languages.css";
+@import "./dialogs.css";
+@import "./profile.css";
+@import "./summary.css";
+@import "./audio.css";

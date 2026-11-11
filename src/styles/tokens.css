@@ -1,0 +1,109 @@
+/* Theme tokens. Light by default; dark when chosen (data-theme="dark") or when the system is dark and no theme is forced. data-theme is set by useTheme.ts and, before the first paint, by the script in index.html.
+   Neutral palette with one action color (blue). In dark mode the solid blue stays saturated (readable white text) and blue texts/links use a lighter tone (--link) to keep the contrast. */
+
+:root {
+  --bg: #e9eefb;
+  --bg-glow: rgb(37 99 235 / 0.09);
+  --surface: #f3f6fd;
+  --surface-2: #e8edf9;
+  --surface-3: #dde4f4;
+  --segment-active: #f8faff;
+  --glass: rgb(243 246 253 / 0.86);
+  --border: rgb(255 255 255 / 0.7);
+  --border-strong: #cfd8ea;
+  --text: #0d1530;
+  --text-muted: #56607a;
+  --text-faint: #8790a8;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-text: #ffffff;
+  --accent-soft: rgb(37 99 235 / 0.1);
+  --link: #1d55e0;
+  --zone: rgb(37 99 235 / 0.05);
+  --zone-border: #a9c0f2;
+  --title-gradient: linear-gradient(90deg, #2563eb, #7c3aed);
+  --circle: radial-gradient(circle at 30% 30%, #f6f8ff, #c9d7fb 70%);
+  --circle-border: rgb(120 150 235 / 0.55);
+  --ready: #16a34a;
+  --processing: #d97706;
+  --pending: #cfd7e8;
+  --error: #dc2626;
+  /* Relief: light from the top left, bluish shadow at the bottom right */
+  --shadow: 8px 8px 22px rgb(150 166 210 / 0.45), -8px -8px 22px rgb(255 255 255 / 0.85);
+  --shadow-floating: 14px 14px 34px rgb(140 158 208 / 0.5), -10px -10px 28px rgb(255 255 255 / 0.9);
+  /* Inset: text fields */
+  --inset: inset 3px 3px 8px rgb(150 166 210 / 0.42), inset -3px -3px 8px rgb(255 255 255 / 0.9);
+  --shadow-small: 3px 3px 8px rgb(140 158 208 / 0.35), -3px -3px 8px rgb(255 255 255 / 0.7);
+  --button-shine: linear-gradient(180deg, #5b95ff 0%, #2563eb 55%, #1e3fb0 100%);
+  --radius: 14px;
+  --radius-lg: 24px;
+  color-scheme: light;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0d1322;
+  --bg-glow: rgb(79 140 255 / 0.14);
+  --surface: #141c2f;
+  --surface-2: #19223a;
+  --surface-3: #222c46;
+  --segment-active: #2a3552;
+  --glass: rgb(20 28 47 / 0.86);
+  --border: rgb(255 255 255 / 0.06);
+  --border-strong: rgb(255 255 255 / 0.14);
+  --text: #e7ecf6;
+  --text-muted: #9aa6bd;
+  --text-faint: #6f7b94;
+  --accent: #3b76f6;
+  --accent-hover: #5a8cff;
+  --accent-text: #ffffff;
+  --accent-soft: rgb(91 140 255 / 0.16);
+  --link: #8bb0ff;
+  --zone: rgb(91 140 255 / 0.06);
+  --zone-border: rgb(130 169 255 / 0.4);
+  --title-gradient: linear-gradient(90deg, #8bb0ff, #b794ff);
+  --circle: radial-gradient(circle at 30% 30%, #1e2a48, #111a30 70%);
+  --circle-border: rgb(110 150 255 / 0.35);
+  --pending: #303c58;
+  --shadow: 8px 8px 22px rgb(0 0 0 / 0.5), -6px -6px 18px rgb(255 255 255 / 0.025);
+  --shadow-floating: 14px 14px 36px rgb(0 0 0 / 0.6), -8px -8px 24px rgb(255 255 255 / 0.03);
+  --inset: inset 3px 3px 8px rgb(0 0 0 / 0.5), inset -2px -2px 6px rgb(255 255 255 / 0.04);
+  --shadow-small: 3px 3px 8px rgb(0 0 0 / 0.45), -2px -2px 6px rgb(255 255 255 / 0.03);
+  --button-shine: linear-gradient(180deg, #6aa0ff 0%, #3b76f6 55%, #2547c4 100%);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1322;
+  --bg-glow: rgb(79 140 255 / 0.14);
+  --surface: #141c2f;
+  --surface-2: #19223a;
+  --surface-3: #222c46;
+  --segment-active: #2a3552;
+  --glass: rgb(20 28 47 / 0.86);
+  --border: rgb(255 255 255 / 0.06);
+  --border-strong: rgb(255 255 255 / 0.14);
+  --text: #e7ecf6;
+  --text-muted: #9aa6bd;
+  --text-faint: #6f7b94;
+  --accent: #3b76f6;
+  --accent-hover: #5a8cff;
+  --accent-text: #ffffff;
+  --accent-soft: rgb(91 140 255 / 0.16);
+  --link: #8bb0ff;
+  --zone: rgb(91 140 255 / 0.06);
+  --zone-border: rgb(130 169 255 / 0.4);
+  --title-gradient: linear-gradient(90deg, #8bb0ff, #b794ff);
+  --circle: radial-gradient(circle at 30% 30%, #1e2a48, #111a30 70%);
+  --circle-border: rgb(110 150 255 / 0.35);
+  --pending: #303c58;
+  --shadow: 8px 8px 22px rgb(0 0 0 / 0.5), -6px -6px 18px rgb(255 255 255 / 0.025);
+  --shadow-floating: 14px 14px 36px rgb(0 0 0 / 0.6), -8px -8px 24px rgb(255 255 255 / 0.03);
+  --inset: inset 3px 3px 8px rgb(0 0 0 / 0.5), inset -2px -2px 6px rgb(255 255 255 / 0.04);
+  --shadow-small: 3px 3px 8px rgb(0 0 0 / 0.45), -2px -2px 6px rgb(255 255 255 / 0.03);
+  --button-shine: linear-gradient(180deg, #6aa0ff 0%, #3b76f6 55%, #2547c4 100%);
+    color-scheme: dark;
+  }
+}

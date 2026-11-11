@@ -1,0 +1,24 @@
+/* Narrow screens */
+
+@media (max-width: 760px) {
+  .dock-label { display: none; }
+  .dock a { padding: 0 0.85rem; }
+  .features { grid-template-columns: 1fr; }
+  .upload-form-footer { grid-template-columns: 1fr; }
+  .upload-form-footer .primary.large { width: 100%; }
+}
+@media (max-width: 520px) {
+  /* Decorative circles: on narrow screens they would sit behind the fields */
+  body::after { display: none; }
+  body::before { width: 300px; height: 300px; left: -170px; top: -170px; }
+  .brand-text { display: none; }
+  .brand { padding-right: 0.35rem; }
+  .fab span { display: none; }
+  .fab { padding: 1rem; }
+  .video-header { flex-direction: column; }
+  .hero { padding-top: 1.25rem; }
+  .home .upload-form { padding: 1rem; border-radius: 22px; }
+  .drop-zone, .link-zone { min-height: 250px; padding: 1.5rem 1rem; }
+  .tabs button { padding: 0.5rem 0.8rem; font-size: 0.88rem; white-space: nowrap; }
+  .video-export { flex-direction: column; align-items: stretch; }
+}

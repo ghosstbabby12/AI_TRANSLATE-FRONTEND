@@ -1,94 +1,93 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { en, erroresServidorEn } from "./en";
-import { es } from "./es";
+import type { InterfaceLanguage } from "../models/user";
+import { en } from "./locales/en";
+import { es } from "./locales/es";
+import { serverErrorsInEnglish } from "./serverErrors";
 
-export type IdiomaUi = "es" | "en";
-export type Clave = keyof typeof es;
+export type TranslationKey = keyof typeof es;
 type Variables = Record<string, string | number>;
 
-const DICCIONARIOS: Record<IdiomaUi, Record<Clave, string>> = { es, en };
-const CLAVE_ALMACEN = "traductor.idioma";
+const DICTIONARIES: Record<InterfaceLanguage, Record<TranslationKey, string>> = { es, en };
+const STORAGE_KEY = "traductor.idioma";
 
-function idiomaInicial(): IdiomaUi {
+function initialLanguage(): InterfaceLanguage {
   try {
-    const guardado = localStorage.getItem(CLAVE_ALMACEN);
-    if (guardado === "es" || guardado === "en") return guardado;
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === "es" || saved === "en") return saved;
   } catch {
-    /* sin almacenamiento */
+    /* no storage */
   }
   return navigator.language?.toLowerCase().startsWith("en") ? "en" : "es";
 }
 
-// Estado a nivel de módulo: lo usan también funciones fuera de React
-// (mensajes del cliente de la API, títulos de videos).
-let actual: IdiomaUi = idiomaInicial();
+// Module-level state: also used outside React (API client messages, video titles).
+let current: InterfaceLanguage = initialLanguage();
 
-/** Traduce una clave, sustituyendo {variables}. Usable fuera de componentes. */
-export function traducir(clave: Clave, vars?: Variables): string {
-  const texto = DICCIONARIOS[actual][clave] ?? es[clave] ?? clave;
-  return vars ? texto.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? `{${k}}`)) : texto;
+/** Translates a key, replacing {variables}. Usable outside components. */
+export function translate(key: TranslationKey, vars?: Variables): string {
+  const text = DICTIONARIES[current][key] ?? es[key] ?? key;
+  return vars ? text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? `{${name}}`)) : text;
 }
 
-export const idiomaActual = () => actual;
+export const currentLanguage = () => current;
 
-/** Los mensajes de error llegan del servidor en español: se traducen los conocidos. */
-export function traducirMensajeServidor(mensaje: string): string {
-  return actual === "en" ? (erroresServidorEn[mensaje] ?? mensaje) : mensaje;
-}
+/** Server error messages arrive in Spanish: the known ones are translated. */
+export const translateServerMessage = (message: string) => (current === "en" ? (serverErrorsInEnglish[message] ?? message) : message);
 
 /**
- * "en" → "Inglés" / "English", con los nombres que ya trae el navegador.
- * `enFrase`: dentro de una oración ("en inglés"); en inglés siguen con mayúscula.
+ * "en" → "Inglés" / "English", using the names the browser already knows.
+ * `inSentence`: inside a sentence ("en inglés"); in English they stay capitalized.
  */
-export function nombreIdioma(codigo: string, { enFrase = false } = {}): string {
+export function languageName(code: string, { inSentence = false } = {}): string {
   try {
-    const nombre = new Intl.DisplayNames([actual], { type: "language" }).of(codigo) ?? codigo;
-    if (enFrase && actual === "es") return nombre.toLowerCase();
-    return nombre.charAt(0).toUpperCase() + nombre.slice(1);
+    const name = new Intl.DisplayNames([current], { type: "language" }).of(code) ?? code;
+    if (inSentence && current === "es") return name.toLowerCase();
+    return name.charAt(0).toUpperCase() + name.slice(1);
   } catch {
-    return codigo.toUpperCase();
+    return code.toUpperCase();
   }
 }
 
-interface ContextoIdioma {
-  idioma: IdiomaUi;
-  setIdioma: (idioma: IdiomaUi) => void;
-  t: typeof traducir;
+/** Date in the interface language. */
+export const formatDate = (iso: string, options: Intl.DateTimeFormatOptions = { dateStyle: "medium", timeStyle: "short" }) =>
+  new Intl.DateTimeFormat(current, options).format(new Date(iso));
+
+interface LanguageContext {
+  language: InterfaceLanguage;
+  setLanguage: (language: InterfaceLanguage) => void;
+  t: typeof translate;
 }
 
-const Contexto = createContext<ContextoIdioma | null>(null);
+const Context = createContext<LanguageContext | null>(null);
 
-export function IdiomaProvider({ children }: { children: ReactNode }) {
-  const [idioma, setEstado] = useState<IdiomaUi>(actual);
+export function I18nProvider({ children }: { children: ReactNode }) {
+  const [language, setState] = useState<InterfaceLanguage>(current);
 
-  const setIdioma = useCallback((nuevo: IdiomaUi) => {
-    actual = nuevo;
-    setEstado(nuevo);
+  const setLanguage = useCallback((next: InterfaceLanguage) => {
+    current = next;
+    setState(next);
     try {
-      localStorage.setItem(CLAVE_ALMACEN, nuevo);
+      localStorage.setItem(STORAGE_KEY, next);
     } catch {
-      /* sin almacenamiento */
+      /* no storage */
     }
   }, []);
 
   useEffect(() => {
-    document.documentElement.lang = idioma;
-    document.title = traducir("app.tituloPestana");
-  }, [idioma]);
+    document.documentElement.lang = language;
+    document.title = translate("app.tabTitle");
+  }, [language]);
 
-  // `t` cambia de identidad con el idioma: los componentes que lo usan se vuelven a pintar
-  const valor = useMemo<ContextoIdioma>(
-    () => ({ idioma, setIdioma, t: (clave, vars) => traducir(clave, vars) }),
-    [idioma, setIdioma],
-  );
-  return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;
+  // `t` changes identity with the language, so components using it re-render
+  const value = useMemo<LanguageContext>(() => ({ language, setLanguage, t: (key, vars) => translate(key, vars) }), [language, setLanguage]);
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 }
 
-export function useIdioma(): ContextoIdioma {
-  const ctx = useContext(Contexto);
-  if (!ctx) throw new Error("useIdioma debe usarse dentro de <IdiomaProvider>");
+export function useLanguage(): LanguageContext {
+  const ctx = useContext(Context);
+  if (!ctx) throw new Error("useLanguage must be used inside <I18nProvider>");
   return ctx;
 }
 
-/** Atajo: const t = useT(); t("clave") */
-export const useT = () => useIdioma().t;
+/** Shortcut: const t = useT(); t("key") */
+export const useT = () => useLanguage().t;

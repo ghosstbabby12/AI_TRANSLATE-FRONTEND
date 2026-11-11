@@ -1,19 +1,17 @@
 import { useState } from "react";
-import type { Usuario } from "../api";
+import type { User } from "../models/user";
 
-/** Foto de perfil o, si no hay (o no carga), la inicial del nombre. */
-export function Avatar({ usuario, grande = false }: { usuario: Pick<Usuario, "nombre" | "url_foto">; grande?: boolean }) {
-  const [fallo, setFallo] = useState<string | null>(null);
-  const inicial = usuario.nombre.trim().charAt(0).toUpperCase() || "?";
-  const clase = `avatar ${grande ? "avatar-grande" : ""}`;
-  if (usuario.url_foto && fallo !== usuario.url_foto) {
-    return (
-      <img className={`${clase} avatar-foto`} src={usuario.url_foto} alt="" onError={() => setFallo(usuario.url_foto)} />
-    );
+/** Profile photo or, when there is none (or it fails to load), the name's initial. */
+export function Avatar({ user, large = false }: { user: Pick<User, "name" | "photoUrl">; large?: boolean }) {
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const initial = user.name.trim().charAt(0).toUpperCase() || "?";
+  const className = `avatar ${large ? "avatar-large" : ""}`;
+  if (user.photoUrl && failedUrl !== user.photoUrl) {
+    return <img className={`${className} avatar-photo`} src={user.photoUrl} alt="" onError={() => setFailedUrl(user.photoUrl)} />;
   }
   return (
-    <span className={clase} aria-hidden>
-      {inicial}
+    <span className={className} aria-hidden>
+      {initial}
     </span>
   );
 }

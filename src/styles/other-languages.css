@@ -1,0 +1,22 @@
+/* Other languages (top of the translation panel) */
+
+.other-languages { display: flex; flex-direction: column; gap: 0.6rem; padding: 0.25rem 0.25rem 0.9rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+.translate-other-button {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  border: 1px dashed var(--zone-border);
+  background: var(--zone);
+  color: var(--link);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.translate-other-button:hover:not(:disabled), .translate-other-button[aria-expanded="true"] { border-style: solid; border-color: var(--accent); background: var(--accent-soft); }
+.translate-other-button svg { width: 18px; height: 18px; }
+.translate-panel { display: flex; flex-direction: column; gap: 0.5rem; animation: appear 0.16s ease-out; }
+.translate-panel .muted { margin: 0; font-size: 0.82rem; }
+.translate-panel-buttons { display: flex; gap: 0.5rem; justify-content: flex-end; }
+.other-translations { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; font-size: 0.82rem; color: var(--text-muted); }
+.chip-link { text-decoration: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); }
+.chip-link:hover { border-color: var(--accent); color: var(--link); }

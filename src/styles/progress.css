@@ -1,0 +1,30 @@
+/* Progress, statuses and spinners */
+
+.progress { display: flex; flex-direction: column; gap: 0.6rem; }
+.progress-header { display: flex; justify-content: space-between; font-size: 0.95rem; }
+.progress-bar { height: 8px; border-radius: 999px; background: var(--pending); overflow: hidden; }
+.progress-bar.thin { height: 5px; margin-top: 0.5rem; width: 100%; }
+.progress-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #2563eb, #7c3aed); transition: width 0.4s ease; }
+.progress-bar.indeterminate .progress-fill { width: 30% !important; animation: slide 1.2s ease-in-out infinite; }
+@keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
+
+.segment-strip { display: flex; gap: 3px; height: 16px; }
+.segment-block { flex-basis: 0; min-width: 3px; padding: 0; border: none; border-radius: 5px; }
+.seg-ready { background: var(--ready); }
+.seg-processing { background: var(--processing); animation: pulse 1s ease-in-out infinite alternate; }
+.seg-pending { background: var(--pending); }
+.seg-failed { background: var(--error); }
+.segment-block.is-active { outline: 2px solid var(--text); outline-offset: 2px; }
+@keyframes pulse { to { opacity: 0.45; } }
+
+.badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.7rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
+.badge-pending { background: var(--surface-2); color: var(--text-muted); }
+.badge-processing { background: color-mix(in srgb, var(--processing) 15%, transparent); color: var(--processing); }
+.badge-completed { background: color-mix(in srgb, var(--ready) 15%, transparent); color: var(--ready); }
+.badge-failed { background: color-mix(in srgb, var(--error) 15%, transparent); color: var(--error); }
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: pulse 0.8s infinite alternate; }
+
+.spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid rgb(255 255 255 / 0.25); border-top-color: #fff; animation: spin 0.8s linear infinite; }
+.spinner-accent { border-color: var(--accent-soft); border-top-color: var(--accent); }
+.spinner-button { width: 16px; height: 16px; border-width: 2px; border-color: rgb(255 255 255 / 0.35); border-top-color: currentColor; }
+@keyframes spin { to { rotate: 360deg; } }
